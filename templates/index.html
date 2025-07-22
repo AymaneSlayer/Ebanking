@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>E-Banking Admin Panel</title>
+</head>
+
+<body>
+   
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="user-avatar" id="userAvatar">AF</div>
+            <div class="user-info">
+                <h4 id="userName">Aymane Falaki</h4>
+                <span id="userRole">Administrator</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <h5>Général</h5>
+                <a href="#" class="menu-item active">
+                    <i>📊</i>
+                    Dashboard
+                </a>
+                <a href="#" class="menu-item">
+                    <i>🎯</i>
+                    Targets
+                </a>
+                <a href="#" class="menu-item">
+                    <i>👥</i>
+                    Campaigns
+                    <span class="menu-badge" id="campaignsBadge">0</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i>📊</i>
+                    Tables
+                </a>
+                <a href="#" class="menu-item">
+                    <i>📱</i>
+                    Apps
+                    <span class="menu-badge" id="appsBadge">0</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i>🎨</i>
+                    Pricing Tables
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <h5>Administration</h5>
+                <a href="{{ url_for('ajouter_client') }}" class="menu-item">
+                    <i>👥</i>
+                    Ajouter Client
+                
+                </a>
+                <a href="{{ url_for('gerer_comptes') }}" class="menu-item">
+                    <i>🔧</i>
+                    Gérer les comptes  
+                </a>
+                
+                </a>
+                <a href="{{ url_for('supprimer_client') }}" class="menu-item">
+                    <i>🧑‍💼</i>
+                    Supprimer un client
+                </a>
+                <a href="#" class="menu-item">
+                    <i>⚙️</i>
+                    Settings
+                <a href="#" class="menu-item">
+                    <i>❤️</i>
+                    Contact
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="header-title">
+                    <h2>Dashboard</h2>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="notification-icon">
+                    <span>🔔</span>
+                    <div class="notification-badge" id="notificationCount">0</div>
+                </div>
+                <div class="notification-icon">
+                    <span>⚙️</span>
+                </div>
+                <div class="notification-icon">
+                    <span>👤</span>
+                </div>
+                <span style="color: #e74c3c; font-weight: 600; margin-left: 10px;" id="headerUserName">Aymane Falaki</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+              <h2 style="margin-bottom: 20px;">Liste des clients</h2>
+        
+        <table class="clients-table" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <thead style="background-color: #2c3e50; color: white;">
+                <tr>
+                    <th style="padding: 12px;">ID</th>
+                    <th style="padding: 12px;">Nom</th>
+                    <th style="padding: 12px;">Prénom</th>
+                    <th style="padding: 12px;">Email</th>
+                </tr>
+            </thead>
+            <tbody>
+    {% for client in clients %}
+    <tr onclick="selectRow(this)">
+        <td>
+            <a href="{{ url_for('client_details', id=client.id) }}"
+            style="text-decoration: none; color: #3498db; font-weight: bold;">
+            #{{ client.id }}
+            </a>
+        </td>
+        <td>{{ client.nom }}</td>
+        <td>{{ client.prenom }}</td>
+        <td>{{ client.email }}</td>
+        <td>
+            <div class="client-actions">
+                <a href="{{ url_for('gerer_comptes', id=client.id) }}">
+                    <button class="client-action-btn edit" title="Éditer">✏️</button>
+                </a>
+                <a href="{{ url_for('supprimer_client', id=client.id) }}">
+                    <button class="client-action-btn delete" title="Supprimer">🗑️</button>
+                </a>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+             
+            
+        </table>
+                
+            </div>
+
+            <!-- Liste des clients (données dynamiques depuis PostgreSQL) -->
+        </div>
+    </div>
+<script>
+function selectRow(row) {
+    // Remove 'selected' from all rows
+    document.querySelectorAll('.clients-table tbody tr').forEach(r => r.classList.remove('selected'));
+    row.classList.add('selected');
+}
+</script>
+
+<div id="sidebar-trigger-zone"
+     style="position: fixed; top: 0; left: 0; width: 20px; height: 100vh; z-index: 3000; background: transparent;"></div>
+
+<div id="sidebar-trigger-zone"
+     style="position: fixed; top: 0; left: 0; width: 20px; height: 100vh; z-index: 3000; background: transparent;"></div>
+
+
+
+
+
+
+</body>
+</html>

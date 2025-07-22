@@ -1,0 +1,176 @@
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+import random
+
+app = Flask(__name__)
+app.secret_key = "supersecret"
+
+# Connexion PostgreSQL
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://Aymane:test1234@localhost:5432/banque_db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# Modèle Client
+class Client(db.Model):
+    __tablename__ = 'Clients'
+
+    id = db.Column("ID", db.String, primary_key=True)
+    nom = db.Column("Nom", db.String(50), nullable=False)
+    prenom = db.Column("Prenom", db.String(50), nullable=False)
+    email = db.Column("Email", db.String(100), unique=True, nullable=False)
+
+    # ⚠️ Clé étrangère définie côté Compte
+    compte = db.relationship("Compte", backref="client", uselist=False)
+
+# Modèle Compte
+class Compte(db.Model):
+    __tablename__ = 'Compte'
+
+    client_id = db.Column("ClientID", db.String, db.ForeignKey("Clients.ID"), primary_key=True)
+    numero = db.Column("Numero", db.String(20), unique=True, nullable=False)
+    solde = db.Column("Solde", db.Float, nullable=False)
+@app.route("/supprimer-client", methods=["GET", "POST"])
+def supprimer_client():
+    if request.method == "POST":
+        client_id = request.form.get("client_id")
+
+        # Vérifier si le client existe
+        client = Client.query.filter_by(id=client_id).first()
+
+        if not client:
+            flash("❌ Client introuvable.", "error")
+            return redirect(url_for("supprimer_client"))
+
+        # Supprimer le compte d'abord (si existe)
+        if client.compte:
+            db.session.delete(client.compte)
+
+        # Supprimer le client ensuite
+        db.session.delete(client)
+        db.session.commit()
+
+        flash("✅ Client et compte supprimés avec succès.", "success")
+        return redirect(url_for("home"))
+
+    return render_template("supprimer_client.html")
+
+
+
+# Générer un ID aléatoire
+def generate_unique_id():
+    while True:
+        new_id = str(random.randint(100000, 999999))
+        if not Client.query.filter_by(id=new_id).first():
+            return new_id
+def generate_account_number():
+    return "BE" + str(random.randint(100000000000, 999999999999))  # Ex: BE123456789012
+
+
+# Route Accueil
+@app.route("/")
+def home():
+    try:
+        clients = Client.query.all()
+        return render_template("index.html", clients=clients)
+    except Exception as e:
+        import traceback
+        return f"<h2>Erreur :</h2><pre>{traceback.format_exc()}</pre>"
+
+# Route Ajout
+@app.route("/ajouter", methods=["GET", "POST"])
+def ajouter_client():
+    if request.method == "POST":
+        nom = request.form["nom"]
+        prenom = request.form["prenom"]
+        email = request.form["email"]
+
+        if Client.query.filter_by(email=email).first():
+            flash("❌ Email déjà utilisé.", "error")
+            return redirect(url_for("ajouter_client"))
+
+        nouveau = Client(id=generate_unique_id(), nom=nom, prenom=prenom, email=email)
+        db.session.add(nouveau)
+        # Créer un compte pour ce client
+        nouveau_compte = Compte(
+            client_id=nouveau.id,
+            numero=generate_account_number(),
+            solde=round(random.uniform(100.0, 10000.0), 2)
+        )
+        db.session.add(nouveau_compte)
+        db.session.commit()
+        flash("✅ Client ajouté !", "success")
+        return redirect(url_for("home"))
+
+    return render_template("ajouter.html")
+@app.route("/client/<int:id>")
+def client_details(id):
+    client = Client.query.get_or_404(str(id))
+    return render_template("client_details.html", client=client)
+@app.route("/gerer-comptes", methods=["GET", "POST"])
+@app.route("/gerer-comptes", methods=["GET", "POST"])
+def gerer_comptes():
+    client = None
+
+    if request.method == "POST":
+        client_id = request.form.get("client_id")
+
+        # Rechercher le client
+        client = Client.query.filter_by(id=client_id).first()
+
+        if client and "update" in request.form:
+            # Mise à jour des données client
+            client.nom = request.form["nom"]
+            client.prenom = request.form["prenom"]
+            client.email = request.form["email"]
+
+            # ✅ Mise à jour du solde si compte associé
+            if client.compte:
+                try:
+                    nouveau_solde = float(request.form["solde"])
+                    client.compte.solde = round(nouveau_solde, 2)
+                except (ValueError, KeyError):
+                    flash("❌ Solde invalide ou manquant.", "error")
+                    return redirect(url_for("gerer_comptes"))
+
+            # Enregistrer en base
+            db.session.commit()
+            flash("✅ Informations mises à jour.", "success")
+
+    return render_template("gerer_comptes.html", client=client)
+
+
+    return render_template("gerer_comptes.html", client=client)
+@app.route("/init-db")
+def init_db():
+    try:
+        db.drop_all()
+        db.create_all()
+        return "✅ Base de données initialisée avec succès !"
+    except Exception as e:
+        return f"❌ Erreur lors de l'initialisation : {str(e)}"
+
+
+
+
+# ➕ Nouvelle route : Dashboard
+@app.route("/dashboard")
+def dashboard():
+    try:
+        nb_clients = Client.query.count()
+        # Simule des données fictives pour stats (si tu veux aller plus loin, tu peux les calculer en base)
+        total_solde = db.session.query(db.func.sum(Compte.solde)).scalar() or 0
+        nb_transactions = 1805  # valeur fictive pour le visuel
+        nb_comments = 54        # idem
+
+        return render_template("dashboard.html",
+                               nb_clients=nb_clients,
+                               total_solde=total_solde,
+                               nb_transactions=nb_transactions,
+                               nb_comments=nb_comments)
+    except Exception as e:
+        import traceback
+        return f"<h2>Erreur Dashboard :</h2><pre>{traceback.format_exc()}</pre>"
+    
+
+if __name__ == "__main__":
+    app.run(debug=True)

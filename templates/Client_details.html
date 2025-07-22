@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails du client</title>
+</head>
+<body>
+    <h2>Détails du client</h2>
+    <ul>
+        <li><strong>ID :</strong> {{ client.id }}</li>
+        <li><strong>Nom :</strong> {{ client.nom }}</li>
+        <li><strong>Prénom :</strong> {{ client.prenom }}</li>
+        <li><strong>Email :</strong> {{ client.email }}</li>
+    </ul>
+    <a href="{{ url_for('home') }}">← Retour</a>
+</body>
+</html>

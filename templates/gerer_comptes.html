@@ -1,0 +1,44 @@
+<h2>Gérer les comptes</h2>
+
+<!-- Formulaire de recherche -->
+<form method="POST">
+    <label for="client_id">🔍 Rechercher par ID :</label>
+    <input type="text" name="client_id" placeholder="Entrer l'ID du client" required>
+    <button type="submit">Rechercher</button>
+</form>
+
+{% if client %}
+    <hr>
+    <form method="POST">
+        <!-- Masquer l'ID pour le garder en mémoire -->
+        <input type="hidden" name="client_id" value="{{ client.id }}">
+        <input type="hidden" name="update" value="1">
+
+        <label>Nom :</label>
+        <input type="text" name="nom" value="{{ client.nom }}" required><br>
+
+        <label>Prénom :</label>
+        <input type="text" name="prenom" value="{{ client.prenom }}" required><br>
+
+        <label>Email :</label>
+        <input type="email" name="email" value="{{ client.email }}" required><br>
+
+        {% if client.compte %}
+            <label>Solde :</label>
+            <input type="number" step="0.01" name="solde" value="{{ client.compte.solde }}" required><br>
+        {% else %}
+            <p style="color: orange;">⚠️ Ce client n'a pas encore de compte associé.</p>
+        {% endif %}
+
+        <button type="submit">💾 Enregistrer</button>
+    </form>
+{% elif request.method == 'POST' %}
+    <p style="color: red;">❌ Client introuvable</p>
+{% endif %}
+
+<!-- Bouton retour Accueil -->
+<div style="text-align: right; margin-bottom: 10px;">
+    <a href="{{ url_for('home') }}" style="text-decoration: none; background-color: #3498db; color: white; padding: 8px 16px; border-radius: 5px;">
+        🏠 Accueil
+    </a>
+</div>

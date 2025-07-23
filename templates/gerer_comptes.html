@@ -1,50 +1,61 @@
-<h2>Gérer les comptes</h2>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gérer les comptes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gerer_comptes.css') }}">
+</head>
+<body>
 
-<!-- Formulaire de recherche -->
-<form method="POST">
-    <label for="client_id">🔍 Rechercher par ID :</label>
-    <input type="text" name="client_id" placeholder="Entrer l'ID du client" required>
-    <button type="submit">Rechercher</button>
-</form>
+<div class="gerer-comptes-container">
+    <h2>Gérer les comptes</h2>
 
-{% if client %}
-    <hr>
+    <!-- Formulaire de recherche -->
     <form method="POST">
-        <!-- Masquer l'ID pour le garder en mémoire -->
-        <input type="hidden" name="client_id" value="{{ client.id }}">
-        <input type="hidden" name="update" value="1">
-
-        <label>Nom :</label>
-        <input type="text" name="nom" value="{{ client.nom }}" required><br>
-
-        <label>Prénom :</label>
-        <input type="text" name="prenom" value="{{ client.prenom }}" required><br>
-
-        <label>Email :</label>
-        <input type="email" name="email" value="{{ client.email }}" required><br>
-
-        {% if client.comptes %}
-            <h3>Comptes associés :</h3>
-            {% for compte in client.comptes %}
-            <div style="margin-bottom: 10px;">
-                <p><strong>Numéro :</strong> {{ compte.numero }}</p>
-                <label>Solde :</label>
-                <input type="number" name="solde_{{ loop.index }}" value="{{ compte.solde }}" step="0.01">
-            </div>
-            {% endfor %}
-        {% else %}
-            <p style="color: orange;">⚠️ Ce client n'a pas encore de compte associé.</p>
-        {% endif %}
-
-        <button type="submit">💾 Enregistrer</button>
+        <label for="client_id">🔍 Rechercher par ID :</label>
+        <input type="text" name="client_id" placeholder="Entrer l'ID du client" required>
+        <button type="submit">Rechercher</button>
     </form>
-{% elif was_posted %}
-  <p style="color: red;">❌ Client introuvable</p>
-{% endif %}
 
-<!-- Bouton retour Accueil -->
-<div style="text-align: right; margin-bottom: 10px;">
-    <a href="{{ url_for('home') }}" style="text-decoration: none; background-color: #3498db; color: white; padding: 8px 16px; border-radius: 5px;">
-        🏠 Accueil
-    </a>
+    {% if client %}
+        <hr>
+        <form method="POST">
+            <input type="hidden" name="client_id" value="{{ client.id }}">
+            <input type="hidden" name="update" value="1">
+
+            <label>Nom :</label>
+            <input type="text" name="nom" value="{{ client.nom }}" required>
+
+            <label>Prénom :</label>
+            <input type="text" name="prenom" value="{{ client.prenom }}" required>
+
+            <label>Email :</label>
+            <input type="email" name="email" value="{{ client.email }}" required>
+
+            {% if client.comptes %}
+                <h3>Comptes associés :</h3>
+                {% for compte in client.comptes %}
+                    <div>
+                        <p><strong>Numéro :</strong> {{ compte.numero }}</p>
+                        <label>Solde :</label>
+                        <input type="number" name="solde_{{ loop.index }}" value="{{ compte.solde }}" step="0.01">
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="message-orange">⚠️ Ce client n'a pas encore de compte associé.</div>
+            {% endif %}
+
+            <button type="submit">💾 Enregistrer</button>
+        </form>
+    {% elif was_posted %}
+        <div class="message-red">❌ Client introuvable</div>
+    {% endif %}
+
+    <!-- Bouton retour Accueil -->
+    <div style="text-align: right; margin-top: 20px;">
+        <a href="{{ url_for('home') }}" class="btn-home">🏠 Accueil</a>
+    </div>
 </div>
+
+</body>
+</html>

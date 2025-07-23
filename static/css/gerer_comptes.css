@@ -1,0 +1,87 @@
+/* Conteneur principal */
+.gerer-comptes-container {
+    max-width: 600px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Titres */
+.gerer-comptes-container h2 {
+    font-size: 26px;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #2c3e50;
+}
+
+/* Labels */
+.gerer-comptes-container label {
+    font-weight: 600;
+    color: #34495e;
+    margin-top: 10px;
+    display: block;
+}
+
+/* Inputs */
+.gerer-comptes-container input[type="text"],
+.gerer-comptes-container input[type="number"],
+.gerer-comptes-container input[type="email"] {
+    width: 100%;
+    padding: 10px 14px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.gerer-comptes-container input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Bouton principal */
+.gerer-comptes-container button[type="submit"] {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    width: 100%;
+}
+
+.gerer-comptes-container button[type="submit"]:hover {
+    background: linear-gradient(135deg, #2980b9, #1f618d);
+}
+
+/* Alertes */
+.flash-message {
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.flash-message.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.flash-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Message d’avertissement */
+.warning-text {
+    color: orange;
+    margin-top: 10px;
+    font-weight: 600;
+}

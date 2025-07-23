@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from flask import jsonify
 import random
 
 app = Flask(__name__)
@@ -107,7 +108,6 @@ def client_details(id):
     client = Client.query.get_or_404(str(id))
     return render_template("client_details.html", client=client)
 @app.route("/gerer-comptes", methods=["GET", "POST"])
-@app.route("/gerer-comptes", methods=["GET", "POST"])
 def gerer_comptes():
     client = None
 
@@ -135,9 +135,6 @@ def gerer_comptes():
             # Enregistrer en base
             db.session.commit()
             flash("✅ Informations mises à jour.", "success")
-
-    return render_template("gerer_comptes.html", client=client)
-
 
     return render_template("gerer_comptes.html", client=client)
 @app.route("/init-db")
@@ -170,7 +167,22 @@ def dashboard():
     except Exception as e:
         import traceback
         return f"<h2>Erreur Dashboard :</h2><pre>{traceback.format_exc()}</pre>"
-    
+@app.route('/modifier_client/<id>', methods=['POST'])
+def modifier_client(id):
+    data = request.get_json()
+    client = db.session.get(Client, id)
+
+    if not client:
+        return jsonify({'error': 'Client introuvable'}), 404
+
+    client.nom = data.get('nom', client.nom)
+    client.prenom = data.get('prenom', client.prenom)
+    client.email = data.get('email', client.email)
+
+    db.session.commit()
+    return jsonify({'message': 'Client modifié avec succès'})
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

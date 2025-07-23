@@ -755,11 +755,7 @@
     transition: background 0.12s, color 0.12s;
 }
 
-/* Highlight active row (on click) */
-.clients-table tbody tr.selected {
-    background: #c8fff4 !important;
-    box-shadow: 0 1px 18px #00b89422;
-}
+
 #headerUserName {
     color: #e74c3c !important;
     font-weight: 700;
@@ -892,4 +888,11 @@
     padding: 15px 12px;
     letter-spacing: 0.5px;
     border: none;
+}
+.inline-input {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
 }

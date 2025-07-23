@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <title>E-Banking Admin Panel</title>
 </head>
 
@@ -121,53 +124,28 @@
     {% for client in clients %}
     <tr onclick="selectRow(this)">
         <td>
-            <a href="{{ url_for('client_details', id=client.id) }}"
-            style="text-decoration: none; color: #3498db; font-weight: bold;">
-            #{{ client.id }}
-            </a>
+  <a href="{{ url_for('client_details', id=client.id) }}"
+     style="text-decoration: none; color: #3498db; font-weight: bold;">
+    #{{ client.id }}
+  </a>
+</td>
+
+
         </td>
         <td>{{ client.nom }}</td>
         <td>{{ client.prenom }}</td>
         <td>{{ client.email }}</td>
         <td>
             <div class="client-actions">
-                <a href="{{ url_for('gerer_comptes', id=client.id) }}">
-                    <button class="client-action-btn edit" title="Éditer">✏️</button>
-                </a>
-                <!-- Bouton qui ouvre le modal Bootstrap -->
-<button class="client-action-btn delete" title="Supprimer"
+                
+                <button class="client-action-btn edit" title="Éditer">✏️</button>
+                <button class="client-action-btn delete" title="Supprimer"
         data-bs-toggle="modal"
         data-bs-target="#confirmDeleteModal{{ client.id }}">
-    🗑️
+  🗑️
 </button>
 
-<!-- Modal de confirmation pour ce client -->
-<div class="modal fade" id="confirmDeleteModal{{ client.id }}" tabindex="-1"
-     aria-labelledby="confirmDeleteLabel{{ client.id }}" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmDeleteLabel{{ client.id }}">Supprimer le client</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-      </div>
-
-      <div class="modal-body">
-        Voulez-vous vraiment supprimer <strong>{{ client.prenom }} {{ client.nom }}</strong> ?
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <form method="POST" action="{{ url_for('supprimer_client') }}">
-          <input type="hidden" name="client_id" value="{{ client.id }}">
-          <button type="submit" class="btn btn-danger">Confirmer</button>
-        </form>
-      </div>
-
-    </div>
-  </div>
-</div>
-
+                
             </div>
         </td>
     </tr>
@@ -198,7 +176,38 @@ function selectRow(row) {
      style="position: fixed; top: 0; left: 0; width: 20px; height: 100vh; z-index: 3000; background: transparent;"></div>
 
 
+<!-- ✅ Modals Bootstrap générés dynamiquement -->
+{% for client in clients %}
+<div class="modal fade" id="confirmDeleteModal{{ client.id }}" tabindex="-1"
+     aria-labelledby="confirmDeleteLabel{{ client.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
 
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteLabel{{ client.id }}">Supprimer le client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+
+      <div class="modal-body">
+        Voulez-vous vraiment supprimer <strong>{{ client.prenom }} {{ client.nom }}</strong> ?
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <form method="POST" action="{{ url_for('supprimer_client') }}">
+          <input type="hidden" name="client_id" value="{{ client.id }}">
+          <button type="submit" class="btn btn-danger">Confirmer</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/tableEdit.js') }}"></script>
 
 
 

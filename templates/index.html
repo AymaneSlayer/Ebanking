@@ -14,72 +14,49 @@
    
     <!-- Sidebar -->
     <nav class="sidebar">
-        <div class="sidebar-header">
-            <div class="user-avatar" id="userAvatar">AF</div>
-            <div class="user-info">
-                <h4 id="userName">Aymane Falaki</h4>
-                <span id="userRole">Administrator</span>
-            </div>
-        </div>
-        
-        <div class="sidebar-menu">
-            <div class="menu-section">
-                <h5>Général</h5>
-                <a href="#" class="menu-item active">
-                    <i>📊</i>
-                    Dashboard
-                </a>
-                <a href="#" class="menu-item">
-                    <i>🎯</i>
-                    Targets
-                </a>
-                <a href="#" class="menu-item">
-                    <i>👥</i>
-                    Campaigns
-                    <span class="menu-badge" id="campaignsBadge">0</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i>📊</i>
-                    Tables
-                </a>
-                <a href="#" class="menu-item">
-                    <i>📱</i>
-                    Apps
-                    <span class="menu-badge" id="appsBadge">0</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i>🎨</i>
-                    Pricing Tables
-                </a>
-            </div>
-            
-            <div class="menu-section">
-                <h5>Administration</h5>
-                <a href="{{ url_for('ajouter_client') }}" class="menu-item">
-                    <i>👥</i>
-                    Ajouter Client
-                
-                </a>
-                <a href="{{ url_for('gerer_comptes') }}" class="menu-item">
-                    <i>🔧</i>
-                    Gérer les comptes  
-                </a>
-                
-                </a>
-                <a href="{{ url_for('supprimer_client') }}" class="menu-item">
-                    <i>🧑‍💼</i>
-                    Supprimer un client
-                </a>
-                <a href="#" class="menu-item">
-                    <i>⚙️</i>
-                    Settings
-                <a href="#" class="menu-item">
-                    <i>❤️</i>
-                    Contact
-                </a>
-            </div>
-        </div>
-    </nav>
+  <div class="sidebar-header">
+    <div class="user-avatar" id="userAvatar">AF</div>
+    <div class="user-info">
+      <h4 id="userName">Aymane Falaki</h4>
+      <span id="userRole">Administrator</span>
+    </div>
+  </div>
+
+  <div class="sidebar-menu">
+    <div class="menu-section">
+      <h5>Général</h5>
+
+      <a href="{{ url_for('dashboard') }}" class="menu-item active">
+        <i>📊</i>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <i>🎯</i>
+        <span>Targets</span>
+      </a>
+
+      <!-- ... autres liens similaires -->
+    </div>
+
+    <div class="menu-section">
+      <h5>Administration</h5>
+
+      <a href="{{ url_for('gerer_comptes') }}" class="menu-item">
+        <i>🔧</i>
+        <span>Gérer les comptes</span>
+      </a>
+
+      <a href="{{ url_for('ajouter_compte') }}" class="menu-item btn-important">
+        <i>➕</i>
+        <span>Créer un compte</span>
+      </a>
+
+      <!-- ... autres liens -->
+    </div>
+  </div>
+</nav>
+
 
     <!-- Main Content -->
     <div class="main-content">
@@ -110,6 +87,12 @@
         <!-- Dashboard Content -->
         <div class="dashboard-content">
               <h2 style="margin-bottom: 20px;">Liste des clients</h2>
+              <div style="display: flex; justify-content: flex-start; margin-bottom: 15px;">
+            <a href="{{ url_for('ajouter_client') }}" class="btn btn-primary" style="font-weight: 600 ; margin-left: 1000px;">
+            ➕ Ajouter un client
+            </a>
+</div>
+
         
         <table class="clients-table" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
             <thead style="background-color: #2c3e50; color: white;">

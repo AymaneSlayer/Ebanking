@@ -21,15 +21,31 @@ class Client(db.Model):
     email = db.Column("Email", db.String(100), unique=True, nullable=False)
 
     # ⚠️ Clé étrangère définie côté Compte
-    compte = db.relationship("Compte", backref="client", uselist=False)
+    comptes = db.relationship("Compte", backref="client", lazy=True)
 
 # Modèle Compte
 class Compte(db.Model):
-    __tablename__ = 'Compte'
-
-    client_id = db.Column("ClientID", db.String, db.ForeignKey("Clients.ID"), primary_key=True)
-    numero = db.Column("Numero", db.String(20), unique=True, nullable=False)
+    __tablename__ = 'Compte'   
+    client_id = db.Column("ClientID", db.String, db.ForeignKey("Clients.ID"))
+    numero = db.Column("Numero", db.String(20), primary_key=True)
     solde = db.Column("Solde", db.Float, nullable=False)
+@app.route("/ajouter-compte", methods=["GET", "POST"])
+def ajouter_compte():
+    clients = Client.query.all()
+
+    if request.method == "POST":
+        client_id = request.form["client_id"]
+        solde = float(request.form["solde"])
+        numero = generate_account_number()
+
+        nouveau_compte = Compte(client_id=client_id, numero=numero, solde=solde)
+        db.session.add(nouveau_compte)
+        db.session.commit()
+
+        flash("✅ Compte ajouté avec succès.", "success")
+
+    return render_template("ajouter_compte.html", clients=clients)
+
 @app.route("/supprimer-client", methods=["GET", "POST"])
 def supprimer_client():
     if request.method == "POST":
@@ -91,13 +107,7 @@ def ajouter_client():
 
         nouveau = Client(id=generate_unique_id(), nom=nom, prenom=prenom, email=email)
         db.session.add(nouveau)
-        # Créer un compte pour ce client
-        nouveau_compte = Compte(
-            client_id=nouveau.id,
-            numero=generate_account_number(),
-            solde=round(random.uniform(100.0, 10000.0), 2)
-        )
-        db.session.add(nouveau_compte)
+
         db.session.commit()
         flash("✅ Client ajouté !", "success")
         return redirect(url_for("home"))
@@ -108,6 +118,7 @@ def client_details(id):
     client = Client.query.get_or_404(str(id))
     return render_template("client_details.html", client=client)
 @app.route("/gerer-comptes", methods=["GET", "POST"])
+
 def gerer_comptes():
     client = None
 
@@ -123,22 +134,23 @@ def gerer_comptes():
             client.prenom = request.form["prenom"]
             client.email = request.form["email"]
 
-            # ✅ Mise à jour du solde si compte associé
-            if client.compte:
+            if client.comptes:
                 try:
                     nouveau_solde = float(request.form["solde"])
-                    client.compte.solde = round(nouveau_solde, 2)
+                    client.comptes[0].solde = round(nouveau_solde, 2)
                 except (ValueError, KeyError):
                     flash("❌ Solde invalide ou manquant.", "error")
                     return redirect(url_for("gerer_comptes"))
 
-            # Enregistrer en base
-            db.session.commit()
-            flash("✅ Informations mises à jour.", "success")
+        return render_template("gerer_comptes.html", client=client,was_posted=(request.method == "POST"))
 
-    return render_template("gerer_comptes.html", client=client)
+    # ✅ Ce return s’exécutera pour les requêtes GET
+    return render_template("gerer_comptes.html", client=None)
+
+
 @app.route("/init-db")
 def init_db():
+
     try:
         db.drop_all()
         db.create_all()

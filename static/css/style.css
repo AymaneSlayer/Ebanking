@@ -52,8 +52,8 @@
             top: 0;
             width: 260px;
             height: 100vh;
-            background: #2c3e50;
-            color: white;
+            background: #4c6596;
+            color: rgb(14, 14, 14);
             z-index: 1000;
             transition: transform 0.3s ease;
         }
@@ -632,11 +632,7 @@
             margin-bottom: 15px;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
+       
             
             .main-content {
                 margin-left: 0;
@@ -659,9 +655,7 @@
             }
         }
         /* Animation sidebar */
-.sidebar {
-    animation: slideSidebar 0.6s cubic-bezier(.33,1,.68,1);
-}
+
 @keyframes slideSidebar {
     from { transform: translateX(-100%);}
     to { transform: translateX(0);}
@@ -767,15 +761,6 @@
 #headerUserName:hover {
     background: #e74c3c;
     color: #fff !important;
-}
-/* MODERN SIDEBAR DESIGN */
-.sidebar {
-    background: linear-gradient(135deg, #262a38 70%, #3b4161 100%);
-    box-shadow: 8px 0 36px #262a3830;
-    border-right: 1.5px solid #31344a;
-    backdrop-filter: blur(2.5px);
-    animation: slideSidebar .8s cubic-bezier(.23,1.2,.32,1) 0s 1;
-    will-change: transform, box-shadow;
 }
 @keyframes slideSidebar {
     from { transform: translateX(-80px); opacity: 0.2; }

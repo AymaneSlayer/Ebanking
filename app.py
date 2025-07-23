@@ -24,6 +24,15 @@ class Client(db.Model):
     comptes = db.relationship("Compte", backref="client", lazy=True)
 
 # Modèle Compte
+class Operation(db.Model):
+    __tablename__ = 'Operations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    compte = db.Column(db.String, nullable=False)
+    montant = db.Column(db.Float, nullable=False)
+    type = db.Column(db.String, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+
 class Compte(db.Model):
     __tablename__ = 'Compte'   
     client_id = db.Column("ClientID", db.String, db.ForeignKey("Clients.ID"))
@@ -115,12 +124,56 @@ def ajouter_client():
         return render_template("ajouter.html", show_modal=True)
 
     return render_template("ajouter.html")
+from datetime import datetime
+from sqlalchemy import text
+
+@app.route("/operations", methods=["GET", "POST"])
+def operations():
+    comptes = Compte.query.all()
+    compte_selectionne = request.args.get('compte_selectionne', default=None)
+
+    if request.method == "POST":
+        numero = request.form["numero"]
+        try:
+            montant = float(request.form["montant"])
+        except ValueError:
+            flash("Montant invalide.", "error")
+            return redirect(url_for("operations", compte_selectionne=numero))
+
+        type_op = request.form["type"]
+        compte = Compte.query.filter_by(numero=numero).first()
+
+        if not compte:
+            flash("Compte introuvable.", "error")
+            return redirect(url_for("operations"))
+
+        if type_op == "Retrait":
+            if compte.solde < montant:
+                flash("Solde insuffisant pour le retrait.", "error")
+                return redirect(url_for("operations", compte_selectionne=numero))
+            compte.solde = round(compte.solde - montant, 2)
+        elif type_op == "Dépôt":
+            compte.solde = round(compte.solde + montant, 2)
+
+        nouvelle_op = Operation(
+            compte=numero,
+            montant=montant,
+            type=type_op,
+            date=datetime.now()
+        )
+
+        db.session.add(nouvelle_op)
+        db.session.add(compte)
+        db.session.commit()
+
+        comptes = Compte.query.all()
+
+        return render_template("depots.html", comptes=comptes, show_modal=True, compte_selectionne=numero)
+
+    return render_template("depots.html", comptes=comptes, compte_selectionne=compte_selectionne)
 
 
-@app.route("/client/<int:id>")
-def client_details(id):
-    client = Client.query.get_or_404(str(id))
-    return render_template("client_details.html", client=client)
+
 @app.route("/gerer-comptes", methods=["GET", "POST"])
 
 def gerer_comptes():
@@ -133,18 +186,11 @@ def gerer_comptes():
         client = Client.query.filter_by(id=client_id).first()
 
         if client and "update" in request.form:
-            # Mise à jour des données client
+    # Mise à jour des données client uniquement
             client.nom = request.form["nom"]
             client.prenom = request.form["prenom"]
             client.email = request.form["email"]
 
-            if client.comptes:
-                try:
-                    nouveau_solde = float(request.form["solde"])
-                    client.comptes[0].solde = round(nouveau_solde, 2)
-                except (ValueError, KeyError):
-                    flash("❌ Solde invalide ou manquant.", "error")
-                    return redirect(url_for("gerer_comptes"))
 
         return render_template("gerer_comptes.html", client=client,was_posted=(request.method == "POST"))
 

@@ -42,9 +42,11 @@ def ajouter_compte():
         db.session.add(nouveau_compte)
         db.session.commit()
 
-        flash("✅ Compte ajouté avec succès.", "success")
+        # Affiche la modal de succès
+        return render_template("ajouter_compte.html", clients=clients, show_modal=True)
 
     return render_template("ajouter_compte.html", clients=clients)
+
 
 @app.route("/supprimer-client", methods=["GET", "POST"])
 def supprimer_client():
@@ -107,12 +109,14 @@ def ajouter_client():
 
         nouveau = Client(id=generate_unique_id(), nom=nom, prenom=prenom, email=email)
         db.session.add(nouveau)
-
         db.session.commit()
-        flash("✅ Client ajouté !", "success")
-        return redirect(url_for("home"))
+
+        # Affiche la popup
+        return render_template("ajouter.html", show_modal=True)
 
     return render_template("ajouter.html")
+
+
 @app.route("/client/<int:id>")
 def client_details(id):
     client = Client.query.get_or_404(str(id))

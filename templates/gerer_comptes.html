@@ -23,17 +23,23 @@
         <label>Email :</label>
         <input type="email" name="email" value="{{ client.email }}" required><br>
 
-        {% if client.compte %}
-            <label>Solde :</label>
-            <input type="number" step="0.01" name="solde" value="{{ client.compte.solde }}" required><br>
+        {% if client.comptes %}
+            <h3>Comptes associés :</h3>
+            {% for compte in client.comptes %}
+            <div style="margin-bottom: 10px;">
+                <p><strong>Numéro :</strong> {{ compte.numero }}</p>
+                <label>Solde :</label>
+                <input type="number" name="solde_{{ loop.index }}" value="{{ compte.solde }}" step="0.01">
+            </div>
+            {% endfor %}
         {% else %}
             <p style="color: orange;">⚠️ Ce client n'a pas encore de compte associé.</p>
         {% endif %}
 
         <button type="submit">💾 Enregistrer</button>
     </form>
-{% elif request.method == 'POST' %}
-    <p style="color: red;">❌ Client introuvable</p>
+{% elif was_posted %}
+  <p style="color: red;">❌ Client introuvable</p>
 {% endif %}
 
 <!-- Bouton retour Accueil -->

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <title>E-Banking Admin Panel</title>
 </head>
 
@@ -11,72 +14,49 @@
    
     <!-- Sidebar -->
     <nav class="sidebar">
-        <div class="sidebar-header">
-            <div class="user-avatar" id="userAvatar">AF</div>
-            <div class="user-info">
-                <h4 id="userName">Aymane Falaki</h4>
-                <span id="userRole">Administrator</span>
-            </div>
-        </div>
-        
-        <div class="sidebar-menu">
-            <div class="menu-section">
-                <h5>Général</h5>
-                <a href="#" class="menu-item active">
-                    <i>📊</i>
-                    Dashboard
-                </a>
-                <a href="#" class="menu-item">
-                    <i>🎯</i>
-                    Targets
-                </a>
-                <a href="#" class="menu-item">
-                    <i>👥</i>
-                    Campaigns
-                    <span class="menu-badge" id="campaignsBadge">0</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i>📊</i>
-                    Tables
-                </a>
-                <a href="#" class="menu-item">
-                    <i>📱</i>
-                    Apps
-                    <span class="menu-badge" id="appsBadge">0</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i>🎨</i>
-                    Pricing Tables
-                </a>
-            </div>
-            
-            <div class="menu-section">
-                <h5>Administration</h5>
-                <a href="{{ url_for('ajouter_client') }}" class="menu-item">
-                    <i>👥</i>
-                    Ajouter Client
-                
-                </a>
-                <a href="{{ url_for('gerer_comptes') }}" class="menu-item">
-                    <i>🔧</i>
-                    Gérer les comptes  
-                </a>
-                
-                </a>
-                <a href="{{ url_for('supprimer_client') }}" class="menu-item">
-                    <i>🧑‍💼</i>
-                    Supprimer un client
-                </a>
-                <a href="#" class="menu-item">
-                    <i>⚙️</i>
-                    Settings
-                <a href="#" class="menu-item">
-                    <i>❤️</i>
-                    Contact
-                </a>
-            </div>
-        </div>
-    </nav>
+  <div class="sidebar-header">
+    <div class="user-avatar" id="userAvatar">AF</div>
+    <div class="user-info">
+      <h4 id="userName">Aymane Falaki</h4>
+      <span id="userRole">Administrator</span>
+    </div>
+  </div>
+
+  <div class="sidebar-menu">
+    <div class="menu-section">
+      <h5>Général</h5>
+
+      <a href="{{ url_for('dashboard') }}" class="menu-item active">
+        <i>📊</i>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <i>🎯</i>
+        <span>Targets</span>
+      </a>
+
+      <!-- ... autres liens similaires -->
+    </div>
+
+    <div class="menu-section">
+      <h5>Administration</h5>
+
+      <a href="{{ url_for('gerer_comptes') }}" class="menu-item">
+        <i>🔧</i>
+        <span>Gérer les comptes</span>
+      </a>
+
+      <a href="{{ url_for('ajouter_compte') }}" class="menu-item btn-important">
+        <i>➕</i>
+        <span>Créer un compte</span>
+      </a>
+
+      <!-- ... autres liens -->
+    </div>
+  </div>
+</nav>
+
 
     <!-- Main Content -->
     <div class="main-content">
@@ -107,6 +87,12 @@
         <!-- Dashboard Content -->
         <div class="dashboard-content">
               <h2 style="margin-bottom: 20px;">Liste des clients</h2>
+              <div style="display: flex; justify-content: flex-start; margin-bottom: 15px;">
+            <a href="{{ url_for('ajouter_client') }}" class="btn btn-primary" style="font-weight: 600 ; margin-left: 1000px;">
+            ➕ Ajouter un client
+            </a>
+</div>
+
         
         <table class="clients-table" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
             <thead style="background-color: #2c3e50; color: white;">
@@ -121,22 +107,28 @@
     {% for client in clients %}
     <tr onclick="selectRow(this)">
         <td>
-            <a href="{{ url_for('client_details', id=client.id) }}"
-            style="text-decoration: none; color: #3498db; font-weight: bold;">
-            #{{ client.id }}
-            </a>
+  <a href="{{ url_for('client_details', id=client.id) }}"
+     style="text-decoration: none; color: #3498db; font-weight: bold;">
+    #{{ client.id }}
+  </a>
+</td>
+
+
         </td>
         <td>{{ client.nom }}</td>
         <td>{{ client.prenom }}</td>
         <td>{{ client.email }}</td>
         <td>
             <div class="client-actions">
-                <a href="{{ url_for('gerer_comptes', id=client.id) }}">
-                    <button class="client-action-btn edit" title="Éditer">✏️</button>
-                </a>
-                <a href="{{ url_for('supprimer_client', id=client.id) }}">
-                    <button class="client-action-btn delete" title="Supprimer">🗑️</button>
-                </a>
+                
+                <button class="client-action-btn edit" title="Éditer">✏️</button>
+                <button class="client-action-btn delete" title="Supprimer"
+        data-bs-toggle="modal"
+        data-bs-target="#confirmDeleteModal{{ client.id }}">
+  🗑️
+</button>
+
+                
             </div>
         </td>
     </tr>
@@ -167,7 +159,38 @@ function selectRow(row) {
      style="position: fixed; top: 0; left: 0; width: 20px; height: 100vh; z-index: 3000; background: transparent;"></div>
 
 
+<!-- ✅ Modals Bootstrap générés dynamiquement -->
+{% for client in clients %}
+<div class="modal fade" id="confirmDeleteModal{{ client.id }}" tabindex="-1"
+     aria-labelledby="confirmDeleteLabel{{ client.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
 
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteLabel{{ client.id }}">Supprimer le client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+
+      <div class="modal-body">
+        Voulez-vous vraiment supprimer <strong>{{ client.prenom }} {{ client.nom }}</strong> ?
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <form method="POST" action="{{ url_for('supprimer_client') }}">
+          <input type="hidden" name="client_id" value="{{ client.id }}">
+          <button type="submit" class="btn btn-danger">Confirmer</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/tableEdit.js') }}"></script>
 
 
 

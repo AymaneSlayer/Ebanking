@@ -79,6 +79,9 @@ def supprimer_client():
         return redirect(url_for("home"))
 
     return render_template("supprimer_client.html")
+
+
+
 # Générer un ID aléatoire
 def generate_unique_id():
     while True:
@@ -210,14 +213,13 @@ def init_db():
 @app.route("/dashboard")
 def dashboard():
     try:
-        clients = Client.query.all()  # Ajouté
-        nb_clients = len(clients)
+        nb_clients = Client.query.count()
+        # Simule des données fictives pour stats (si tu veux aller plus loin, tu peux les calculer en base)
         total_solde = db.session.query(db.func.sum(Compte.solde)).scalar() or 0
-        nb_transactions = 1805
-        nb_comments = 54
+        nb_transactions = 1805  # valeur fictive pour le visuel
+        nb_comments = 54        # idem
 
-        return render_template("index.html",
-                               clients=clients,  # Ajouté
+        return render_template("dashboard.html",
                                nb_clients=nb_clients,
                                total_solde=total_solde,
                                nb_transactions=nb_transactions,
@@ -225,7 +227,6 @@ def dashboard():
     except Exception as e:
         import traceback
         return f"<h2>Erreur Dashboard :</h2><pre>{traceback.format_exc()}</pre>"
-
 @app.route('/modifier_client/<id>', methods=['POST'])
 def modifier_client(id):
     data = request.get_json()
@@ -240,6 +241,7 @@ def modifier_client(id):
 
     db.session.commit()
     return jsonify({'message': 'Client modifié avec succès'})
+
 
 
 

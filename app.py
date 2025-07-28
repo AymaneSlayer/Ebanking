@@ -55,9 +55,6 @@ def ajouter_compte():
         return render_template("ajouter_compte.html", clients=clients, show_modal=True)
 
     return render_template("ajouter_compte.html", clients=clients)
-
-
-@app.route("/supprimer-client", methods=["GET", "POST"])
 @app.route("/supprimer-client", methods=["GET", "POST"])
 def supprimer_client():
     if request.method == "POST":

@@ -19,34 +19,24 @@
 
     {% if client %}
         <hr>
-        <form method="POST">
-            <input type="hidden" name="client_id" value="{{ client.id }}">
-            <input type="hidden" name="update" value="1">
-
-            <label>Nom :</label>
-            <input type="text" name="nom" value="{{ client.nom }}" required>
-
-            <label>Prénom :</label>
-            <input type="text" name="prenom" value="{{ client.prenom }}" required>
-
-            <label>Email :</label>
-            <input type="email" name="email" value="{{ client.email }}" required>
+        <div>
+            <p><strong>Nom :</strong> {{ client.nom }}</p>
+            <p><strong>Prénom :</strong> {{ client.prenom }}</p>
+            <p><strong>Email :</strong> {{ client.email }}</p>
 
             {% if client.comptes %}
                 <h3>Comptes associés :</h3>
                 {% for compte in client.comptes %}
                     <div>
                         <p><strong>Numéro :</strong> {{ compte.numero }}</p>
-                        <label>Solde :</label>
-                        <input type="number" name="solde_{{ loop.index }}" value="{{ compte.solde }}" step="0.01">
+                        <p><strong>Solde :</strong> {{ compte.solde }} €</p>
+                        <hr>
                     </div>
                 {% endfor %}
             {% else %}
                 <div class="message-orange">⚠️ Ce client n'a pas encore de compte associé.</div>
             {% endif %}
-
-            <button type="submit">💾 Enregistrer</button>
-        </form>
+        </div>
     {% elif was_posted %}
         <div class="message-red">❌ Client introuvable</div>
     {% endif %}

@@ -24,6 +24,15 @@ class Client(db.Model):
     comptes = db.relationship("Compte", backref="client", lazy=True)
 
 # Modèle Compte
+class Operation(db.Model):
+    __tablename__ = 'Operations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    compte = db.Column(db.String, nullable=False)
+    montant = db.Column(db.Float, nullable=False)
+    type = db.Column(db.String, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+
 class Compte(db.Model):
     __tablename__ = 'Compte'   
     client_id = db.Column("ClientID", db.String, db.ForeignKey("Clients.ID"))
@@ -42,31 +51,34 @@ def ajouter_compte():
         db.session.add(nouveau_compte)
         db.session.commit()
 
-        flash("✅ Compte ajouté avec succès.", "success")
+        # Affiche la modal de succès
+        return render_template("ajouter_compte.html", clients=clients, show_modal=True)
 
     return render_template("ajouter_compte.html", clients=clients)
 
+
+@app.route("/supprimer-client", methods=["GET", "POST"])
 @app.route("/supprimer-client", methods=["GET", "POST"])
 def supprimer_client():
     if request.method == "POST":
         client_id = request.form.get("client_id")
 
-        # Vérifier si le client existe
         client = Client.query.filter_by(id=client_id).first()
 
         if not client:
             flash("❌ Client introuvable.", "error")
             return redirect(url_for("supprimer_client"))
 
-        # Supprimer le compte d'abord (si existe)
-        if client.compte:
-            db.session.delete(client.compte)
+        # Supprimer tous les comptes liés
+        if client.comptes:
+            for compte in client.comptes:
+                db.session.delete(compte)
 
-        # Supprimer le client ensuite
+        # Supprimer le client
         db.session.delete(client)
         db.session.commit()
 
-        flash("✅ Client et compte supprimés avec succès.", "success")
+        flash("✅ Client et ses comptes supprimés avec succès.", "success")
         return redirect(url_for("home"))
 
     return render_template("supprimer_client.html")
@@ -107,16 +119,62 @@ def ajouter_client():
 
         nouveau = Client(id=generate_unique_id(), nom=nom, prenom=prenom, email=email)
         db.session.add(nouveau)
-
         db.session.commit()
-        flash("✅ Client ajouté !", "success")
-        return redirect(url_for("home"))
+
+        # Affiche la popup
+        return render_template("ajouter.html", show_modal=True)
 
     return render_template("ajouter.html")
-@app.route("/client/<int:id>")
-def client_details(id):
-    client = Client.query.get_or_404(str(id))
-    return render_template("client_details.html", client=client)
+from datetime import datetime
+from sqlalchemy import text
+
+@app.route("/operations", methods=["GET", "POST"])
+def operations():
+    comptes = Compte.query.all()
+    compte_selectionne = request.args.get('compte_selectionne', default=None)
+
+    if request.method == "POST":
+        numero = request.form["numero"]
+        try:
+            montant = float(request.form["montant"])
+        except ValueError:
+            flash("Montant invalide.", "error")
+            return redirect(url_for("operations", compte_selectionne=numero))
+
+        type_op = request.form["type"]
+        compte = Compte.query.filter_by(numero=numero).first()
+
+        if not compte:
+            flash("Compte introuvable.", "error")
+            return redirect(url_for("operations"))
+
+        if type_op == "Retrait":
+            if compte.solde < montant:
+                flash("Solde insuffisant pour le retrait.", "error")
+                return redirect(url_for("operations", compte_selectionne=numero))
+            compte.solde = round(compte.solde - montant, 2)
+        elif type_op == "Dépôt":
+            compte.solde = round(compte.solde + montant, 2)
+
+        nouvelle_op = Operation(
+            compte=numero,
+            montant=montant,
+            type=type_op,
+            date=datetime.now()
+        )
+
+        db.session.add(nouvelle_op)
+        db.session.add(compte)
+        db.session.commit()
+
+        comptes = Compte.query.all()
+
+        return render_template("depots.html", comptes=comptes, show_modal=True, compte_selectionne=numero)
+
+    return render_template("depots.html", comptes=comptes, compte_selectionne=compte_selectionne)
+
+
+
 @app.route("/gerer-comptes", methods=["GET", "POST"])
 
 def gerer_comptes():
@@ -129,18 +187,11 @@ def gerer_comptes():
         client = Client.query.filter_by(id=client_id).first()
 
         if client and "update" in request.form:
-            # Mise à jour des données client
+    # Mise à jour des données client uniquement
             client.nom = request.form["nom"]
             client.prenom = request.form["prenom"]
             client.email = request.form["email"]
 
-            if client.comptes:
-                try:
-                    nouveau_solde = float(request.form["solde"])
-                    client.comptes[0].solde = round(nouveau_solde, 2)
-                except (ValueError, KeyError):
-                    flash("❌ Solde invalide ou manquant.", "error")
-                    return redirect(url_for("gerer_comptes"))
 
         return render_template("gerer_comptes.html", client=client,was_posted=(request.method == "POST"))
 

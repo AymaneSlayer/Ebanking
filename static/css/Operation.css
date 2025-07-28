@@ -1,0 +1,25 @@
+body {
+    background-color: #f9f9f9;
+    color: #2c3e50;
+    font-family: 'Poppins', sans-serif;
+}
+
+h2 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.btn-success {
+    background: linear-gradient(to right, #2ecc71, #27ae60);
+    border: none;
+}
+
+.btn-secondary {
+    background-color: #7f8c8d;
+    border: none;
+}

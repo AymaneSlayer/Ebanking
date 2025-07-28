@@ -6,10 +6,12 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f6fa;
-            color: #2c3e50;
+            font-family: 'Poppins', sans-serif;
+          
+            color: #ffffff !important;
             overflow-x: hidden;
+            background: #fcf9f9;
+
         }
 
         /* Loading Spinner */
@@ -52,10 +54,10 @@
             top: 0;
             width: 260px;
             height: 100vh;
-            background: #4c6596;
-            color: rgb(14, 14, 14);
-            z-index: 1000;
-            transition: transform 0.3s ease;
+            background:#2f3542;
+            color:#f0f0f0;
+            z-index: 1000;  
+        
         }
 
         .sidebar-header {
@@ -109,10 +111,14 @@
             display: flex;
             align-items: center;
             padding: 12px 20px;
-            color: #bdc3c7;
+            color: #ffffff;
             text-decoration: none;
             transition: all 0.3s ease;
             position: relative;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 6px;
         }
 
         .menu-item:hover,
@@ -132,10 +138,16 @@
         }
 
         .menu-item i {
-            width: 20px;
-            margin-right: 15px;
-            font-size: 16px;
-        }
+            background: none; /* ⬅️ supprime le fond */
+            border-radius: 0;  /* ⬅️ supprime la forme arrondie */
+            width: auto;       /* ⬅️ pas de carré imposé */
+            height: auto;
+            margin-right: 13px;
+            font-size: 17px;
+            color: #ffffff !important;
+            display: inline;   /* ou inline-flex si tu veux garder un peu de contrôle */
+            transition: color 0.18s;
+        }   
 
         .menu-badge {
             margin-left: auto;
@@ -479,7 +491,7 @@
         .clients-title {
             margin-bottom: 20px;
             color: #2c3e50;
-            font-size: 20px;
+            font-size: 30px;
             font-weight: 600;
         }
 
@@ -803,13 +815,13 @@
     z-index: 1;
 }
 .menu-item i {
-    background: linear-gradient(120deg, #466bff40 30%, #22d6fbd0 100%);
-    border-radius: 6px;
-    width: 28px;
-    height: 28px;
+    background: none;
+    border-radius: 0;
+    width: auto;
+    height: auto;
     margin-right: 13px;
     font-size: 17px;
-    color: #b9d0ff;
+    color: #ffffff !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -834,11 +846,7 @@
     background: linear-gradient(180deg, #51c2fc 0%, #466bff 100%);
     z-index: 2;
 }
-.menu-item:hover i,
-.menu-item.active i {
-    background: linear-gradient(120deg, #51c2fc 40%, #466bff 100%);
-    color: #fff;
-}
+
 .menu-badge {
     background: linear-gradient(90deg, #ff7675 60%, #e17055 100%);
     color: #fff;
@@ -881,3 +889,13 @@
     border: 1px solid #ccc;
     font-size: 14px;
 }
+.dashboard-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 5px;
+}
+

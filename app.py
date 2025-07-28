@@ -58,26 +58,27 @@ def ajouter_compte():
 
 
 @app.route("/supprimer-client", methods=["GET", "POST"])
+@app.route("/supprimer-client", methods=["GET", "POST"])
 def supprimer_client():
     if request.method == "POST":
         client_id = request.form.get("client_id")
 
-        # Vérifier si le client existe
         client = Client.query.filter_by(id=client_id).first()
 
         if not client:
             flash("❌ Client introuvable.", "error")
             return redirect(url_for("supprimer_client"))
 
-        # Supprimer le compte d'abord (si existe)
-        if client.compte:
-            db.session.delete(client.compte)
+        # Supprimer tous les comptes liés
+        if client.comptes:
+            for compte in client.comptes:
+                db.session.delete(compte)
 
-        # Supprimer le client ensuite
+        # Supprimer le client
         db.session.delete(client)
         db.session.commit()
 
-        flash("✅ Client et compte supprimés avec succès.", "success")
+        flash("✅ Client et ses comptes supprimés avec succès.", "success")
         return redirect(url_for("home"))
 
     return render_template("supprimer_client.html")

@@ -4,22 +4,26 @@
     <meta charset="UTF-8">
     <title>Gérer les comptes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/gerer_comptes.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
 
 <div class="gerer-comptes-container">
-    <h2>Gérer les comptes</h2>
+    <h2><i class="bi bi-gear-fill"></i> Gérer les comptes</h2>
 
     <!-- Formulaire de recherche -->
-    <form method="POST">
-        <label for="client_id">🔍 Rechercher par ID :</label>
-        <input type="text" name="client_id" placeholder="Entrer l'ID du client" required>
-        <button type="submit">Rechercher</button>
+    <form method="POST" class="search-form">
+        <label for="client_id">Rechercher par ID :</label>
+        <div class="input-icon-group">
+            <i class="bi bi-search input-icon"></i>
+            <input type="text" name="client_id" placeholder="Entrer l'ID du client" required>
+        </div>
+        <button type="submit"><i class="bi bi-search"></i> Rechercher</button>
     </form>
 
     {% if client %}
         <hr>
-        <div>
+        <div class="client-info">
             <p><strong>Nom :</strong> {{ client.nom }}</p>
             <p><strong>Prénom :</strong> {{ client.prenom }}</p>
             <p><strong>Email :</strong> {{ client.email }}</p>
@@ -27,10 +31,9 @@
             {% if client.comptes %}
                 <h3>Comptes associés :</h3>
                 {% for compte in client.comptes %}
-                    <div>
+                    <div class="compte-box">
                         <p><strong>Numéro :</strong> {{ compte.numero }}</p>
                         <p><strong>Solde :</strong> {{ compte.solde }} €</p>
-                        <hr>
                     </div>
                 {% endfor %}
             {% else %}
@@ -42,8 +45,10 @@
     {% endif %}
 
     <!-- Bouton retour Accueil -->
-    <div style="text-align: right; margin-top: 20px;">
-        <a href="{{ url_for('home') }}" class="btn-home">🏠 Accueil</a>
+    <div class="btn-retour">
+        <a href="{{ url_for('dashboard') }}" class="btn-home">
+            <i class="bi bi-house-fill"></i> Accueil
+        </a>
     </div>
 </div>
 

@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <title>E-Banking Admin Panel</title>
 </head>
 
@@ -15,11 +15,11 @@
     <!-- Sidebar -->
     <nav class="sidebar">
   <div class="sidebar-header">
-    <div class="user-avatar" id="userAvatar">AF</div>
-    <div class="user-info">
-      <h4 id="userName">Aymane Falaki</h4>
-      <span id="userRole">Administrator</span>
-    </div>
+    <h2 class="dashboard-title">
+    Admin Panel
+</h2>
+
+   
   </div>
 
   <div class="sidebar-menu">
@@ -27,7 +27,8 @@
       <h5>Général</h5>
 
       <a href="{{ url_for('dashboard') }}" class="menu-item active">
-        <i>📊</i>
+      <i class="bi bi-speedometer2"></i>
+
         <span>Dashboard</span>
       </a>
 
@@ -39,25 +40,26 @@
       <h5>Gestion des comptes </h5>
 
       <a href="{{ url_for('gerer_comptes') }}" class="menu-item">
-        <i>🔧</i>
+        <i class="bi bi-gear-fill"></i>
         <span>Gérer les comptes</span>
       </a>
 
       <a href="{{ url_for('ajouter_compte') }}" class="menu-item btn-important">
-        <i>➕</i>
+        <i class="bi bi-person"></i>
         <span>Créer un compte</span>
       </a>
      <div class="menu-section">
       <h5>Opérations </h5>
       <a href="{{ url_for('operations') }}" class="menu-item btn-important">
-        <i>🏦</i>
+        <i class="bi bi-credit-card"></i>
+
         <span>Dépots / Retraits</span>
       </a>
 
       <!-- ... autres liens -->
        
-      <a href="#" class="menu-item">
-        <i>💸</i>
+      <a href="{{ url_for('historique') }}" class="menu-item">
+        <i class="bi bi-arrow-up-circle"></i>
         <span>Historique des opérations</span>
       </a>
     </div>
@@ -77,31 +79,50 @@
             </div>
             
             <div class="header-actions">
-                <div class="notification-icon">
-                    <span>🔔</span>
-                    <div class="notification-badge" id="notificationCount">0</div>
-                </div>
-                <div class="notification-icon">
-                    <span>⚙️</span>
-                </div>
-                <div class="notification-icon">
-                    <span>👤</span>
-                </div>
-                <span style="color: #e74c3c; font-weight: 600; margin-left: 10px;" id="headerUserName">Aymane Falaki</span>
-            </div>
+                <div class="dropdown">
+  <button class="btn btn-light dropdown-toggle" type="button" id="settingsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-gear-fill"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
+    <li><a class="dropdown-item" href="#">Modifier mot de passe</a></li>
+    <li><a class="dropdown-item" href="#">Paramètres système</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item text-danger" href="#">Reset complet</a></li>
+  </ul>
+</div>
+
+        <!-- Dropdown compte admin -->
+<div class="dropdown">
+  <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="compteDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-person-circle me-2 fs-5"></i>
+    <span style="font-weight: 600;">Aymane Falaki</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="compteDropdown">
+    <li><a class="dropdown-item" href="#">Profil</a></li>
+    <li><a class="dropdown-item" href="#">Paramètres</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Se déconnecter</a></li>
+  </ul>
+</div>
+
         </header>
 
         <!-- Dashboard Content -->
         <div class="dashboard-content">
-              <h2 style="margin-bottom: 20px;">Liste des clients</h2>
-              <div style="display: flex; justify-content: flex-start; margin-bottom: 15px;">
-            <a href="{{ url_for('ajouter_client') }}" class="btn btn-primary" style="font-weight: 600 ; margin-left: 1000px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="clients-title mb-0">Liste des clients</h2>
+
+        <a href="{{ url_for('ajouter_client') }}"
+           class="add-client-btn"
+           style="margin-top: 5px;">
             ➕ Ajouter un client
-            </a>
+        </a>
+    </div>
 </div>
 
+
         
-        <table class="clients-table" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <table class="clients-table" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);margin-left: 30px;">
             <thead style="background-color: #2c3e50; color: white;">
                 <tr>
                     <th style="padding: 12px;">ID</th>
@@ -196,8 +217,19 @@ function selectRow(row) {
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='js/tableEdit.js') }}"></script>
+<script>
+    // Activer le spinner quand un formulaire est soumis
+    document.querySelectorAll("form").forEach(form => {
+        form.addEventListener("submit", () => {
+            document.getElementById("spinner").style.display = "flex";
+        });
+    });
+</script>
 
-
-
+<!-- 🔄 Spinner de chargement -->
+<div class="loading" id="spinner" style="display: none; position: fixed; top: 0; left: 0;
+     width: 100vw; height: 100vh; background: rgba(255,255,255,0.6); z-index: 9999;">
+    <div class="spinner"></div>
+</div>
 </body>
 </html>

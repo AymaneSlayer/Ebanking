@@ -79,18 +79,32 @@
             </div>
             
             <div class="header-actions">
-                <div class="notification-icon">
-                    <span>🔔</span>
-                    <div class="notification-badge" id="notificationCount">0</div>
-                </div>
-                <div class="notification-icon">
-                    <span>⚙️</span>
-                </div>
-                <div class="notification-icon">
-                    <span>👤</span>
-                </div>
-                <span style="color: #e74c3c; font-weight: 600; margin-left: 10px;" id="headerUserName">Aymane Falaki</span>
-            </div>
+                <div class="dropdown">
+  <button class="btn btn-light dropdown-toggle" type="button" id="settingsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-gear-fill"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
+    <li><a class="dropdown-item" href="#">Modifier mot de passe</a></li>
+    <li><a class="dropdown-item" href="#">Paramètres système</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item text-danger" href="#">Reset complet</a></li>
+  </ul>
+</div>
+
+        <!-- Dropdown compte admin -->
+<div class="dropdown">
+  <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="compteDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-person-circle me-2 fs-5"></i>
+    <span style="font-weight: 600;">Aymane Falaki</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="compteDropdown">
+    <li><a class="dropdown-item" href="#">Profil</a></li>
+    <li><a class="dropdown-item" href="#">Paramètres</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Se déconnecter</a></li>
+  </ul>
+</div>
+
         </header>
 
         <!-- Dashboard Content -->
@@ -108,7 +122,7 @@
 
 
         
-        <table class="clients-table" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <table class="clients-table" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);margin-left: 30px;">
             <thead style="background-color: #2c3e50; color: white;">
                 <tr>
                     <th style="padding: 12px;">ID</th>

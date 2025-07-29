@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
 import random
@@ -10,6 +10,13 @@ app.secret_key = "supersecret"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://Aymane:test1234@localhost:5432/banque_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+class Admin(db.Model):
+    __tablename__ = 'Admins'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)  # non hashé si tu veux le laisser simple
 
 # Modèle Client
 class Client(db.Model):
@@ -38,6 +45,36 @@ class Compte(db.Model):
     client_id = db.Column("ClientID", db.String, db.ForeignKey("Clients.ID"))
     numero = db.Column("Numero", db.String(20), primary_key=True)
     solde = db.Column("Solde", db.Float, nullable=False)
+@app.route('/create-admin-table')
+def create_admin_table():
+    try:
+        db.create_all()
+        return "✅ Table Admins créée avec succès !"
+    except Exception as e:
+        return f"❌ Erreur : {e}"
+
+# ✨ Page de connexion
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        utilisateur = request.form['username']
+        mot_de_passe = request.form['password']
+
+        admin = Admin.query.filter_by(username=utilisateur, password=mot_de_passe).first()
+
+        if admin:
+            session['utilisateur'] = admin.username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Identifiants incorrects', 'error')
+
+    return render_template('login.html')
+
+# ✨ Page de déconnexion
+@app.route('/logout')
+def logout():
+    session.pop('utilisateur', None)
+    return redirect(url_for('login'))
 @app.route("/ajouter-compte", methods=["GET", "POST"])
 def ajouter_compte():
     clients = Client.query.all()
@@ -92,15 +129,10 @@ def generate_account_number():
     return "BE" + str(random.randint(100000000000, 999999999999))  # Ex: BE123456789012
 
 
-# Route Accueil
 @app.route("/")
 def home():
-    try:
-        clients = Client.query.all()
-        return render_template("index.html", clients=clients)
-    except Exception as e:
-        import traceback
-        return f"<h2>Erreur :</h2><pre>{traceback.format_exc()}</pre>"
+    return redirect(url_for("login"))
+
 
 # Route Ajout
 @app.route("/ajouter", methods=["GET", "POST"])
@@ -212,21 +244,27 @@ def init_db():
 # ➕ Nouvelle route : Dashboard
 @app.route("/dashboard")
 def dashboard():
+    if 'utilisateur' not in session:
+        return redirect(url_for('login'))
+
     try:
         nb_clients = Client.query.count()
-        # Simule des données fictives pour stats (si tu veux aller plus loin, tu peux les calculer en base)
         total_solde = db.session.query(db.func.sum(Compte.solde)).scalar() or 0
-        nb_transactions = 1805  # valeur fictive pour le visuel
-        nb_comments = 54        # idem
+        nb_transactions = 1805
+        nb_comments = 54
+        clients = Client.query.all()  # 👉 cette ligne manquait
 
-        return render_template("dashboard.html",
+        return render_template("index.html",
                                nb_clients=nb_clients,
                                total_solde=total_solde,
                                nb_transactions=nb_transactions,
-                               nb_comments=nb_comments)
+                               nb_comments=nb_comments,
+                               clients=clients)  # 👉 ajoute ce paramètre
     except Exception as e:
         import traceback
         return f"<h2>Erreur Dashboard :</h2><pre>{traceback.format_exc()}</pre>"
+
+
 @app.route('/modifier_client/<id>', methods=['POST'])
 def modifier_client(id):
     data = request.get_json()

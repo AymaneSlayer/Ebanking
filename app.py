@@ -241,9 +241,9 @@ def modifier_client(id):
 
     db.session.commit()
     return jsonify({'message': 'Client modifié avec succès'})
-
-
-
-
+@app.route("/historique")
+def historique():
+    operations = Operation.query.order_by(Operation.date.desc()).all()
+    return render_template("historique.html", operations=operations)
 if __name__ == "__main__":
     app.run(debug=True)

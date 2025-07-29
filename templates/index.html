@@ -58,7 +58,7 @@
 
       <!-- ... autres liens -->
        
-      <a href="#" class="menu-item">
+      <a href="{{ url_for('historique') }}" class="menu-item">
         <i class="bi bi-arrow-up-circle"></i>
         <span>Historique des opérations</span>
       </a>
@@ -95,12 +95,17 @@
 
         <!-- Dashboard Content -->
         <div class="dashboard-content">
-              <h2 style="margin-bottom: 20px;", class="clients-title">Liste des clients</h2>
-              <div style="display: flex; justify-content: flex-start; margin-bottom: 15px;">
-            <a href="{{ url_for('ajouter_client') }}" class="btn btn-primary" style="font-weight: 600 ; margin-left: 1000px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="clients-title mb-0">Liste des clients</h2>
+
+        <a href="{{ url_for('ajouter_client') }}"
+           class="add-client-btn"
+           style="margin-top: 5px;">
             ➕ Ajouter un client
-            </a>
+        </a>
+    </div>
 </div>
+
 
         
         <table class="clients-table" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">

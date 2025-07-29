@@ -898,4 +898,8 @@
     gap: 10px;
     padding-left: 5px;
 }
+a.btn,
+a.add-client-btn {
+    text-decoration: none !important;
+}
 

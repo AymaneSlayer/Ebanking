@@ -27,9 +27,13 @@ function attachEditLogic() {
             const actionWrapper = actionsCell.querySelector('.client-actions') || actionsCell;
 
             actionWrapper.innerHTML = `
-                <button class="client-action-btn save" title="Sauvegarder">✅</button>
-                <button class="client-action-btn cancel" title="Annuler">❌</button>
-            `;
+    <button class="btn btn-success btn-sm client-action-btn save" title="Sauvegarder">
+        <i class="bi bi-check-lg"></i>
+    </button>
+    <button class="btn btn-secondary btn-sm client-action-btn cancel" title="Annuler">
+        <i class="bi bi-x-lg"></i>
+    </button>
+`;
 
             // Entrée déclenche sauvegarde
             [tds[1], tds[2], tds[3]].forEach(td => {
@@ -57,13 +61,16 @@ function attachEditLogic() {
                         tds[3].innerText = newEmail;
 
                         actionWrapper.innerHTML = `
-                            <button class="client-action-btn edit" title="Éditer">✏️</button>
-                            <button class="client-action-btn delete" title="Supprimer"
-                                data-bs-toggle="modal"
-                                data-bs-target="#confirmDeleteModal${id}">
-                                🗑️
-                            </button>
-                        `;
+    <button class="btn btn-outline-warning btn-sm client-action-btn edit" title="Éditer">
+        <i class="bi bi-pencil"></i>
+    </button>
+    <button class="btn btn-outline-danger btn-sm client-action-btn delete" title="Supprimer"
+        data-bs-toggle="modal"
+        data-bs-target="#confirmDeleteModal${id}">
+        <i class="bi bi-trash"></i>
+    </button>
+`;
+
 
                         row.classList.remove('editing');
                         attachEditLogic(); // Réattache les événements

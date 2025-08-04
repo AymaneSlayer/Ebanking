@@ -1,51 +1,283 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Historique des opérations</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-  <style>
-    /* On enlève le padding gauche du container pour coller à gauche */
-    .no-padding-left {
-      padding-left: 0 !important;
-    }
-    /* Supprimer margin du titre */
-    h1 {
-      margin: 0 !important;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>Historique des opérations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        body {
+            background: #f8f9fc;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px 20px;
+            transition: margin-left 0.3s ease;
+            width: calc(100vw - 250px);
+            box-sizing: border-box;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+            .app-container:not(.sidebar-visible) .main-content {
+                margin-left: 0;
+            }
+            .app-container.sidebar-visible .main-content {
+                margin-left: 250px;
+            }
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            border-left: 4px solid #fc4a1a;
+        }
+
+        .page-title {
+            color: white;
+            font-weight: 700;
+            font-size: 1.75rem;
+            margin: 0;
+        }
+
+        .home-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(116, 79, 168, 0.3);
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(116, 79, 168, 0.4);
+            color: white;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            width: 100%;
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 20px 15px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fc;
+            transform: scale(1.01);
+        }
+
+        .table tbody td {
+            padding: 18px 15px;
+            vertical-align: middle;
+            border-color: #e3e6f0;
+            font-weight: 500;
+        }
+
+        .montant-positif {
+            color: #1cc88a;
+            font-weight: 700;
+        }
+
+        .montant-negatif {
+            color: #e74a3b;
+            font-weight: 700;
+        }
+
+        .type-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .type-depot {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .type-retrait {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .type-virement {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .toggle-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #4e73df;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 15px 0 rgba(78, 115, 223, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .toggle-btn {
+                display: block;
+            }
+            .main-content {
+                padding: 20px 15px;
+                padding-top: 80px;
+            }
+            .page-header {
+                padding: 20px;
+            }
+        }
+
+        /* Animation pour les lignes du tableau */
+        .table tbody tr {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+        .table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+        .table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+        .table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+        .table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="app-container">
+        <!-- Include Sidebar -->
+        {% include 'sidebar.html' %}
 
-<div class="container no-padding-left my-4 d-flex justify-content-between align-items-center">
-  <h1>Historique des opérations</h1>
-  <a href="{{ url_for('home') }}" class="btn btn-outline-primary d-flex align-items-center">
-    <i class="bi bi-house-fill me-1"></i> Home
-  </a>
-</div>
+        <!-- Toggle Button pour mobile -->
+        <button class="toggle-btn" id="sidebarToggle">
+            <i class="bi bi-list"></i>
+        </button>
 
-<table class="table table-bordered table-striped">
-  <thead>
-    <tr>
-      <th>Compte</th>
-      <th>Montant</th>
-      <th>Type</th>
-      <th>Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for op in operations %}
-    <tr>
-      <td>{{ op.compte }}</td>
-      <td>{{ "%.2f"|format(op.montant) }} €</td>
-      <td>{{ op.type }}</td>
-      <td>{{ op.date.strftime("%d/%m/%Y %H:%M:%S") }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <h1 class="page-title">
+                    <i class="bi bi-clock-history me-3"></i>
+                    Historique des opérations
+                </h1>
+            </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="bi bi-credit-card me-2"></i>Compte</th>
+                            <th><i class="bi bi-currency-euro me-2"></i>Montant</th>
+                            <th><i class="bi bi-tag me-2"></i>Type</th>
+                            <th><i class="bi bi-calendar me-2"></i>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for op in operations %}
+                        <tr>
+                            <td>
+                                <strong>{{ op.compte }}</strong>
+                            </td>
+                            <td>
+                                <span class="{% if op.montant > 0 %}montant-positif{% else %}montant-negatif{% endif %}">
+                                    {{ "%.2f"|format(op.montant) }} €
+                                </span>
+                            </td>
+                            <td>
+                                <span class="type-badge type-{{ op.type.lower() }}">
+                                    {{ op.type }}
+                                </span>
+                            </td>
+                            <td>
+                                <i class="bi bi-clock me-2"></i>
+                                {{ op.date.strftime("%d/%m/%Y %H:%M:%S") }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleBtn = document.getElementById("sidebarToggle");
+            const container = document.querySelector(".app-container");
+
+            // Masquer la sidebar par défaut sur mobile
+            if (window.innerWidth <= 768) {
+                container.classList.remove("sidebar-visible");
+            } else {
+                container.classList.add("sidebar-visible");
+            }
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener("click", function () {
+                    container.classList.toggle("sidebar-visible");
+                });
+            }
+
+            // Écouteur d'événement pour redimensionnement fenêtre
+            window.addEventListener("resize", function () {
+                if (window.innerWidth > 768) {
+                    container.classList.add("sidebar-visible");
+                } else {
+                    container.classList.remove("sidebar-visible");
+                }
+            });
+        });
+    </script>
 </body>
 </html>

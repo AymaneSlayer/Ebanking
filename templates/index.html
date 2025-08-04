@@ -1,235 +1,286 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Bootstrap CSS -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="fr">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Dashboard E-Banking Adria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+    <meta name="description" content="Dashboard de gestion bancaire Adria">
+    <meta name="msapplication-tap-highlight" content="no">
+    
+    <!-- CSS Links -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <title>E-Banking Admin Panel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    
 </head>
 
 <body>
-   
-    <!-- Sidebar -->
-    <nav class="sidebar">
-  <div class="sidebar-header">
-    <h2 class="dashboard-title">
-    Admin Panel
-</h2>
+    <div class="app-container">
+         {% include 'sidebar.html' %}
 
-   
-  </div>
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- HEADER -->
+            <div class="app-header">
+                <div class="app-header__content">
+                    <div class="app-header-left">
+                        <h4 class="mb-0">Aymane Falaki</h4>
 
-  <div class="sidebar-menu">
-    <div class="menu-section">
-      <h5>Général</h5>
-
-      <a href="{{ url_for('dashboard') }}" class="menu-item active">
-      <i class="bi bi-speedometer2"></i>
-
-        <span>Dashboard</span>
-      </a>
-
-
-      <!-- ... autres liens similaires -->
-    </div>
-
-    <div class="menu-section">
-      <h5>Gestion des comptes </h5>
-
-      <a href="{{ url_for('gerer_comptes') }}" class="menu-item">
-        <i class="bi bi-gear-fill"></i>
-        <span>Gérer les comptes</span>
-      </a>
-
-      <a href="{{ url_for('ajouter_compte') }}" class="menu-item btn-important">
-        <i class="bi bi-person"></i>
-        <span>Créer un compte</span>
-      </a>
-     <div class="menu-section">
-      <h5>Opérations </h5>
-      <a href="{{ url_for('operations') }}" class="menu-item btn-important">
-        <i class="bi bi-credit-card"></i>
-
-        <span>Dépots / Retraits</span>
-      </a>
-
-      <!-- ... autres liens -->
-       
-      <a href="{{ url_for('historique') }}" class="menu-item">
-        <i class="bi bi-arrow-up-circle"></i>
-        <span>Historique des opérations</span>
-      </a>
-    </div>
-  </div>
-</nav>
-
-
-    <!-- Main Content -->
-    <div class="main-content">
-        
-        <!-- Top Header -->
-        <header class="top-header">
-            <div class="header-left">
-                <div class="header-title">
-                    <h2>Dashboard</h2>
+                    </div>
+                    
                 </div>
             </div>
-            
-            <div class="header-actions">
-                <div class="dropdown">
-  <button class="btn btn-light dropdown-toggle" type="button" id="settingsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="bi bi-gear-fill"></i>
-  </button>
-  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
-    <li><a class="dropdown-item" href="#">Modifier mot de passe</a></li>
-    <li><a class="dropdown-item" href="#">Paramètres système</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item text-danger" href="#">Reset complet</a></li>
-  </ul>
-</div>
 
-        <!-- Dropdown compte admin -->
-<div class="dropdown">
-  <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="compteDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="bi bi-person-circle me-2 fs-5"></i>
-    <span style="font-weight: 600;">Aymane Falaki</span>
-  </button>
-  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="compteDropdown">
-    <li><a class="dropdown-item" href="#">Profil</a></li>
-    <li><a class="dropdown-item" href="#">Paramètres</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Se déconnecter</a></li>
-  </ul>
-</div>
+            <!-- TITLE -->
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div>Dashboard</div>
+                </div>
+            </div>
 
-        </header>
+            <!-- SUMMARY CARDS -->
+            <div class="row">
+                <div class="col-md-6 col-xl-3">
+                    <div class="widget-card bg-deposits">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Dépôts</div>
+                                <div class="widget-subheading">Total ce mois</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers" id="total-deposits">245,500 DH</div>
+                                <i class="bi bi-arrow-down-circle widget-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="widget-card bg-withdrawals">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Retraits</div>
+                                <div class="widget-subheading">Total ce mois</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers" id="total-withdrawals">128,750 DH</div>
+                                <i class="bi bi-arrow-up-circle widget-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="widget-card bg-transfers">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Virements</div>
+                                <div class="widget-subheading">Total ce mois</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers" id="total-transfers">89,320 DH</div>
+                                <i class="bi bi-arrow-left-right widget-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="widget-card bg-balance">
+                        <div class="widget-content-wrapper">
+                            <div class="widget-content-left">
+                                <div class="widget-heading">Solde Total</div>
+                                <div class="widget-subheading">Tous comptes</div>
+                            </div>
+                            <div class="widget-content-right">
+                                <div class="widget-numbers" id="total-balance">1,256,480 DH</div>
+                                <i class="bi bi-wallet2 widget-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Dashboard Content -->
-        <div class="dashboard-content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="clients-title mb-0">Liste des clients</h2>
-
-        <a href="{{ url_for('ajouter_client') }}"
-           class="add-client-btn"
-           style="margin-top: 5px;">
-            ➕ Ajouter un client
-        </a>
+           <!-- CHARTS ROW -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <i class="bi bi-pie-chart"></i>
+                    Répartition par Type
+                </div>
+            </div>
+            <div class="chart-body">
+                <canvas id="typesPieChart" height="150"></canvas>
+            </div>
+        </div>
     </div>
 </div>
-
-
-        
-        <table class="clients-table" style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);margin-left: 30px;">
-            <thead style="background-color: #2c3e50; color: white;">
-                <tr>
-                    <th style="padding: 12px;">ID</th>
-                    <th style="padding: 12px;">Nom</th>
-                    <th style="padding: 12px;">Prénom</th>
-                    <th style="padding: 12px;">Email</th>
-                </tr>
-            </thead>
-            <tbody>
-    {% for client in clients %}
-    <tr onclick="selectRow(this)">
+            <!-- RECENT TRANSACTIONS TABLE -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-container">
+                        <div class="chart-header">
+                            <div class="chart-title">
+                                <i class="bi bi-clock-history"></i>
+                                Dernières Transactions
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Compte</th>
+                                        <th>Type</th>
+                                        <th>Montant</th>
+                                        <th>Date</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-transactions">
+    {% for op in recent_ops %}
+    <tr>
+        <td><strong>#{{ "%03d" | format(op.id) }}</strong></td>
+        <td>{{ op.compte }}</td>
         <td>
-    <span style="font-weight: bold; color: #2c3e50;">#{{ client.id }}</span>
-
-</td>
-
-
+            <span class="transaction-type type-{{ op.type|lower }}">
+                {{ op.type }}
+            </span>
         </td>
-        <td>{{ client.nom }}</td>
-        <td>{{ client.prenom }}</td>
-        <td>{{ client.email }}</td>
         <td>
-            <div class="client-actions">
-                
-                <button class="client-action-btn edit" title="Éditer">✏️</button>
-                <button class="client-action-btn delete" title="Supprimer"
-        data-bs-toggle="modal"
-        data-bs-target="#confirmDeleteModal{{ client.id }}">
-  🗑️
-</button>
-
-                
-            </div>
+            <span class="transaction-amount {% if op.type == 'Dépôt' %}amount-positive{% else %}amount-negative{% endif %}">
+                {% if op.type == 'Dépôt' %}+{% else %}-{% endif %}{{ "{:,.2f}".format(op.montant) }} DH
+            </span>
         </td>
+        <td>{{ op.date.strftime("%d/%m/%Y") }}</td>
+        <td><span class="badge bg-success">Validé</span></td>
     </tr>
     {% endfor %}
 </tbody>
 
-             
-            
-        </table>
-                
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Liste des clients (données dynamiques depuis PostgreSQL) -->
+            <!-- MONTHLY VOLUME CHART -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">
+                                <i class="bi bi-graph-up"></i>
+                                Volume des Transactions par Mois
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="monthlyVolumeChart" height="80"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-<script>
-function selectRow(row) {
-    // Remove 'selected' from all rows
-    document.querySelectorAll('.clients-table tbody tr').forEach(r => r.classList.remove('selected'));
-    row.classList.add('selected');
-}
-</script>
 
-<div id="sidebar-trigger-zone"
-     style="position: fixed; top: 0; left: 0; width: 20px; height: 100vh; z-index: 3000; background: transparent;"></div>
-
-<div id="sidebar-trigger-zone"
-     style="position: fixed; top: 0; left: 0; width: 20px; height: 100vh; z-index: 3000; background: transparent;"></div>
-
-
-<!-- ✅ Modals Bootstrap générés dynamiquement -->
-{% for client in clients %}
-<div class="modal fade" id="confirmDeleteModal{{ client.id }}" tabindex="-1"
-     aria-labelledby="confirmDeleteLabel{{ client.id }}" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmDeleteLabel{{ client.id }}">Supprimer le client</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-      </div>
-
-      <div class="modal-body">
-        Voulez-vous vraiment supprimer <strong>{{ client.prenom }} {{ client.nom }}</strong> ?
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <form method="POST" action="{{ url_for('supprimer_client') }}">
-          <input type="hidden" name="client_id" value="{{ client.id }}">
-          <button type="submit" class="btn btn-danger">Confirmer</button>
-        </form>
-      </div>
-
-    </div>
-  </div>
-</div>
-{% endfor %}
-
-<!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url_for('static', filename='js/tableEdit.js') }}"></script>
-<script>
-    // Activer le spinner quand un formulaire est soumis
-    document.querySelectorAll("form").forEach(form => {
-        form.addEventListener("submit", () => {
-            document.getElementById("spinner").style.display = "flex";
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        
+        // Graphique en secteurs des types d'opérations
+        const pieCtx = document.getElementById('typesPieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Dépôts', 'Retraits', 'Virements'],
+                datasets: [{
+                    data: [245500, 128750, 89320],
+                    backgroundColor: [
+                        '#667eea',
+                        '#f5576c',
+                        '#4facfe'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
         });
-    });
-</script>
 
-<!-- 🔄 Spinner de chargement -->
-<div class="loading" id="spinner" style="display: none; position: fixed; top: 0; left: 0;
-     width: 100vw; height: 100vh; background: rgba(255,255,255,0.6); z-index: 9999;">
-    <div class="spinner"></div>
-</div>
+        // Graphique mensuel avec données réelles
+        const monthlyCtx = document.getElementById('monthlyVolumeChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû'],
+                datasets: [{
+                    label: 'Volume Total (DH)',
+                    data: [1250000, 1350000, 1180000, 1420000, 1380000, 1290000, 1460000, 1520000],
+                    backgroundColor: 'rgba(30, 60, 114, 0.8)',
+                    borderColor: '#1e3c72',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return (value / 1000000).toFixed(1) + 'M DH';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Animation des compteurs
+        function animateCounter(elementId, targetValue, suffix = ' DH') {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            let currentValue = 0;
+            const increment = targetValue / 100;
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(currentValue).toLocaleString() + suffix;
+            }, 20);
+        }
+
+        // Animer les compteurs au chargement
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                animateCounter('total-deposits', 245500);
+                animateCounter('total-withdrawals', 128750);
+                animateCounter('total-transfers', 89320);
+                animateCounter('total-balance', 1256480);
+            }, 500);
+        });
+    </script>
 </body>
 </html>

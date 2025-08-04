@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Clients_Detail.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du client - {{ client.nom }} {{ client.prenom }}</title>
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <div class="app-sidebar sidebar-shadow">
+            <div class="app-header__logo">
+                <div class="logo-container" style="text-align: center; margin-bottom: 20px;">
+                    <img src="{{ url_for('static', filename='img/adria-logo.png') }}" alt="Logo Adria" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+
+            <div class="scrollbar-sidebar">
+                <div class="app-sidebar__inner">
+                    <ul class="vertical-nav-menu">
+                        <li class="app-sidebar__heading">Navigation</li>
+
+                        <li>
+                            <a href="{{ url_for('dashboard') }}">
+                                <i class="bi bi-speedometer2"></i> 
+                                Dashboard
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('liste_clients') }}">
+                                <i class="bi bi-person-fill"></i>
+                                Gérer les clients
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('ajouter_compte') }}">
+                                <i class="bi bi-wallet2"></i>
+                                Comptes bancaires
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('operations') }}">
+                                <i class="bi bi-arrow-left-right"></i>
+                                Opérations
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('historique') }}">
+                                <i class="bi bi-clock-history"></i>
+                                Historique
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('logout') }}">
+                                <i class="bi bi-box-arrow-right"></i>
+                                Déconnexion
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- FIN SIDEBAR -->
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- En-tête avec informations client -->
+            <div class="client-header-card">
+                <div class="client-info-section">
+                    
+                    <div class="client-details">
+                        <h1 class="client-name">{{ client.nom }} {{ client.prenom }}</h1>
+                        <p class="client-email"><i class="bi bi-envelope"></i> {{ client.email }}</p>
+                        <p class="client-id"><i class="bi bi-hash"></i> ID: {{ client.id }}</p>
+                        <p class="client-join-date"><i class="bi bi-calendar-plus"></i> Client depuis: {{ client.date_creation }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques rapides -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ comptes|length }}</div>
+                        <div class="stat-label">Comptes</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-info">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ transactions|length }}</div>
+                        <div class="stat-label">Transactions</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ derniere_activite }}</div>
+                        <div class="stat-label">Dernière activité</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comptes bancaires -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="bi bi-wallet2"></i>
+                        Comptes bancaires
+                    </h3>
+                    <button class="btn btn-primary btn-sm" onclick="ajouterCompte()">
+                        <i class="bi bi-plus-circle"></i> Nouveau compte
+                    </button>
+                </div>
+                
+                <div class="accounts-grid">
+                    {% for compte in comptes %}
+                    <div class="account-card">
+                        <div class="account-header">
+                            <div class="account-type">
+                                <i class="bi bi-credit-card"></i>
+                                {{ compte.type_compte }}
+                            </div>
+                            <div class="account-actions">
+                                <a href="{{ url_for('details_compte', numero=compte.numero) }}" class="btn-icon" title="Voir détails">
+                                    <i class="bi bi-gear-fill"></i>
+                                </a>
+
+
+                                <button class="btn-icon btn-danger" onclick="deleteAccount('{{ compte.numero }}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="account-number">{{ compte.numero }}</div>
+                        <div class="account-balance">
+                            <span class="balance-amount {{ 'positive' if compte.solde >= 0 else 'negative' }}">
+                                {{ compte.solde }}€
+                            </span>
+                        </div>
+                        <div class="account-status">
+                            <span class="status-badge {{ 'active' if compte.etat_carte == 'actif' else 'inactive' }}">
+    {{ 'Actif' if compte.etat_carte == 'actif' else 'Inactif' }}
+</span>
+
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Transactions récentes -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="bi bi-clock-history"></i>
+                        Transactions récentes
+                    </h3>
+                    <button class="btn btn-primary btn-sm" onclick="nouvelleTransaction()">
+                        <i class="bi bi-plus-circle"></i> Nouvelle transaction
+                    </button>
+                </div>
+                
+                <div class="transactions-table-container">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Compte</th>
+                                <th>Description</th>
+                                <th>Montant</th>
+                                <th>Solde après</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr class="transaction-row">
+                                <td>
+                                    <div class="transaction-date">
+                                        <div class="date-main">{{ transaction.date.strftime('%d/%m/%Y') }}</div>
+                                        <div class="date-time">{{ transaction.date.strftime('%H:%M') }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="transaction-type type-{{ transaction.type.lower() }}">
+                                        <i class="bi bi-{{ 'arrow-up' if transaction.type == 'DEPOT' else 'arrow-down' if transaction.type == 'RETRAIT' else 'arrow-left-right' }}"></i>
+                                        {{ transaction.type }}
+                                    </span>
+                                </td>
+                                <td class="account-info">{{ transaction.compte.numero_compte }}</td>
+                                <td class="transaction-description">{{ transaction.description or '-' }}</td>
+                                <td class="amount {{ 'positive' if transaction.montant > 0 else 'negative' }}">
+                                    {{ '+' if transaction.montant > 0 else '' }}{{ transaction.montant }}€
+                                </td>
+                                <td class="balance-after">{{ transaction.solde_apres }}€</td>
+                                <td class="transaction-actions">
+                                    <button class="btn-icon" onclick="voirTransaction({{ transaction.id }})">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn-icon btn-danger" onclick="annulerTransaction({{ transaction.id }})">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function editClient() {
+            // Logique pour éditer le client
+            alert('Fonctionnalité d\'édition du client à implémenter');
+        }
+
+        function ajouterCompte() {
+            // Redirection vers la page d'ajout de compte
+            window.location.href = '/comptes/nouveau?client_id={{ client.id }}';
+        }
+
+        function editAccount(compteId) {
+            // Logique pour éditer un compte
+            alert('Édition du compte ' + compteId);
+        }
+
+        function deleteAccount(compteId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce compte ?')) {
+                window.location.href = '/supprimer-compte/' + compteId;
+    }
+}
+
+
+        function nouvelleTransaction() {
+            // Redirection vers la page de nouvelle transaction
+            window.location.href = '/transactions/nouvelle?client_id={{ client.id }}';
+        }
+
+        function voirTransaction(transactionId) {
+            // Voir les détails d'une transaction
+            alert('Détails de la transaction ' + transactionId);
+        }
+
+        function annulerTransaction(transactionId) {
+            if (confirm('Êtes-vous sûr de vouloir annuler cette transaction ?')) {
+                // Logique d'annulation
+                alert('Annulation de la transaction ' + transactionId);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <div class="app-sidebar sidebar-shadow">
+            <div class="app-header__logo">
+                <div class="logo-container" style="text-align: center; margin-bottom: 20px;">
+                    <img src="{{ url_for('static', filename='img/adria-logo.png') }}" alt="Logo Adria" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+
+            <div class="scrollbar-sidebar">
+                <div class="app-sidebar__inner">
+                    <ul class="vertical-nav-menu">
+                        <li class="app-sidebar__heading">Navigation</li>
+
+                        <li>
+                            <a href="{{ url_for('dashboard') }}">
+                                <i class="bi bi-speedometer2"></i> 
+                                Dashboard
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('liste_clients') }}">
+                                <i class="bi bi-person-fill"></i>
+                                Gérer les clients
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('ajouter_compte') }}">
+                                <i class="bi bi-wallet2"></i>
+                                Comptes bancaires
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('operations') }}">
+                                <i class="bi bi-arrow-left-right"></i>
+                                Opérations
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('historique') }}">
+                                <i class="bi bi-clock-history"></i>
+                                Historique
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ url_for('logout') }}">
+                                <i class="bi bi-box-arrow-right"></i>
+                                Déconnexion
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const toggleBtn = document.getElementById("sidebarToggle");
+        const container = document.querySelector(".app-container");
+
+        // Masquer la sidebar par défaut sur mobile
+        if (window.innerWidth <= 768) {
+            container.classList.remove("sidebar-visible");
+        } else {
+            container.classList.add("sidebar-visible");
+        }
+
+        toggleBtn.addEventListener("click", function () {
+            container.classList.toggle("sidebar-visible");
+        });
+
+        // Écouteur d'événement pour redimensionnement fenêtre
+        window.addEventListener("resize", function () {
+            if (window.innerWidth > 768) {
+                container.classList.add("sidebar-visible");
+            } else {
+                container.classList.remove("sidebar-visible");
+            }
+        });
+    });
+</script>
+
+</body>
+        <!-- FIN SIDEBAR -->
+<style>
+.app-sidebar {
+    width: 250px;
+    background: #ffffff;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    overflow: hidden;
+    border-right: 1px solid #e3e6f0;
+}
+
+.sidebar-shadow {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.app-header__logo {
+    padding: 20px;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.scrollbar-sidebar {
+    height: calc(100vh - 120px);
+    overflow:hidden;
+
+}
+
+.vertical-nav-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.app-sidebar__heading {
+    padding: 10px 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #8a92b2;
+}
+
+.vertical-nav-menu li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #5a5c69;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 0 25px 25px 0;
+    margin-right: 15px;
+}
+
+.vertical-nav-menu li a:hover,
+.vertical-nav-menu li a.active {
+    background: #4e73df;
+    color: white;
+    transform: translateX(5px);
+}
+
+.vertical-nav-menu li a i {
+    margin-right: 12px;
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+}
+
+
+
+</style>

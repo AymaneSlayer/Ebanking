@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Détails du compte - {{ compte.numero }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+</head>
+<body>
+    <h1>Détails du compte {{ compte.numero }}</h1>
+
+    <p><strong>Numéro:</strong> {{ compte.numero }}</p>
+    <p><strong>Solde:</strong> {{ compte.solde }}€</p>
+    <p><strong>État carte:</strong> {{ compte.etat_carte }}</p>
+
+    <h2>Opérations récentes</h2>
+    <ul>
+        {% for op in operations %}
+        <li>{{ op.date.strftime('%d/%m/%Y %H:%M') }} - {{ op.type }} - {{ op.montant }}€</li>
+        {% else %}
+        <li>Aucune opération</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('details_client', client_id=compte.client_id) }}">← Retour au client</a>
+</body>
+</html>

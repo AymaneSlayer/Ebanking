@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Clients.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des clients</title>
+    
+</head>
+<body>
+    <div class="app-container">
+         {% include 'sidebar.html' %}
+       
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="dashboard-content">
+                <div class="clients-header d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="clients-title">Liste des clients</h2>
+                    <a href="{{ url_for('ajouter_client') }}" class="btn btn-success">
+                        <i class="bi bi-person-plus"></i>
+                        Ajouter un client
+                    </a>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table clients-table">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Email</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for client in clients %}
+                                <tr class="client-row" id="client-{{ client.id }}">
+                                    <td><span class="badge bg-secondary">#{{ client.id }}</span></td>
+                                    <td class="editable" data-field="nom" data-client-id="{{ client.id }}">{{ client.nom }}</td>
+                                    <td class="editable" data-field="prenom" data-client-id="{{ client.id }}">{{ client.prenom }}</td>
+                                    <td class="editable" data-field="email" data-client-id="{{ client.id }}">{{ client.email }}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-outline-info btn-sm" 
+                                                    onclick="voirDetails({{ client.id }})" 
+                                                    style="outline: none !important; box-shadow: none !important;"
+                                                    onfocus="this.blur()">
+                                                <i class="bi bi-gear"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-warning btn-sm btn-edit" 
+                                                    onclick="toggleEditMode({{ client.id }})"
+                                                    style="outline: none !important; box-shadow: none !important;"
+                                                    onfocus="this.blur()">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                    onclick="supprimerClient({{ client.id }})"
+                                                    style="outline: none !important; box-shadow: none !important;"
+                                                    onfocus="this.blur()">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let editingClient = null;
+        let originalValues = {};
+
+        // Initialiser les tooltips Bootstrap - DÉSACTIVÉ
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        //     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        //         return new bootstrap.Tooltip(tooltipTriggerEl);
+        //     });
+        // });
+
+        // Fonction pour voir les détails d'un client
+        function voirDetails(clientId) {
+            const baseUrl = "{{ url_for('details_client', client_id=0) }}".replace('0', clientId);
+            window.location.href = baseUrl;
+        }
+
+        // Fonction pour basculer en mode édition
+        function toggleEditMode(clientId) {
+            if (editingClient && editingClient !== clientId) {
+                cancelEdit(editingClient);
+            }
+
+            const row = document.getElementById(`client-${clientId}`);
+            const editableCells = row.querySelectorAll('.editable');
+            const editButton = row.querySelector('.btn-edit');
+            
+            if (editingClient === clientId) {
+                // Sauvegarder les modifications
+                saveClient(clientId);
+            } else {
+                // Entrer en mode édition
+                startEdit(clientId, editableCells, editButton, row);
+            }
+        }
+
+        function startEdit(clientId, editableCells, editButton, row) {
+            editingClient = clientId;
+            originalValues = {};
+            
+            editableCells.forEach(cell => {
+                const field = cell.dataset.field;
+                const currentValue = cell.textContent.trim();
+                originalValues[field] = currentValue;
+                
+                // Créer l'input
+                const input = document.createElement('input');
+                input.type = field === 'email' ? 'email' : 'text';
+                input.className = 'form-control form-control-sm';
+                input.value = currentValue;
+                input.dataset.field = field;
+                
+                // Remplacer le contenu par l'input
+                cell.innerHTML = '';
+                cell.appendChild(input);
+                cell.classList.add('editing');
+            });
+            
+            // Changer le bouton en "Sauvegarder"
+            editButton.innerHTML = '<i class="bi bi-check"></i>';
+            editButton.className = 'btn btn-success btn-sm btn-save';
+            editButton.style.cssText = 'outline: none !important; box-shadow: none !important;';
+            editButton.onfocus = function() { this.blur(); };
+            
+            // Ajouter un bouton annuler
+            const cancelButton = document.createElement('button');
+            cancelButton.type = 'button';
+            cancelButton.className = 'btn btn-secondary btn-sm ms-1';
+            cancelButton.innerHTML = '<i class="bi bi-x"></i>';
+            cancelButton.onclick = () => cancelEdit(clientId);
+            cancelButton.style.cssText = 'outline: none !important; box-shadow: none !important;';
+            cancelButton.onfocus = function() { this.blur(); };
+            
+            editButton.parentNode.appendChild(cancelButton);
+            
+            // Focus sur le premier input
+            const firstInput = row.querySelector('input');
+            if (firstInput) firstInput.focus();
+        }
+
+        function saveClient(clientId) {
+            const row = document.getElementById(`client-${clientId}`);
+            const inputs = row.querySelectorAll('input');
+            const data = { id: clientId };
+            
+            // Collecter les nouvelles valeurs
+            inputs.forEach(input => {
+                data[input.dataset.field] = input.value.trim();
+            });
+            
+            // Validation basique
+            if (!data.nom || !data.prenom || !data.email) {
+                showAlert('Tous les champs sont requis', 'danger');
+                return;
+            }
+            
+            if (!isValidEmail(data.email)) {
+                showAlert('Format d\'email invalide', 'danger');
+                return;
+            }
+            
+            // VRAI APPEL AJAX VERS VOTRE BACKEND FLASK
+            fetch(`/clients/${clientId}/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers.get('content-type'));
+                
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        console.log('Response text:', text);
+                        throw new Error('Le serveur n\'a pas retourné du JSON valide');
+                    });
+                }
+                
+                return response.json();
+            })
+            .then(result => {
+                console.log('Result:', result);
+                if (result && result.success) {
+                    updateDisplayValues(clientId, data);
+                    exitEditMode(clientId);
+                    showAlert('Client mis à jour avec succès', 'success');
+                } else {
+                    throw new Error(result ? result.message || 'Erreur lors de la mise à jour' : 'Réponse invalide du serveur');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur complète:', error);
+                showAlert('Erreur lors de la mise à jour: ' + error.message, 'danger');
+            });
+        }
+
+        function cancelEdit(clientId) {
+            const row = document.getElementById(`client-${clientId}`);
+            
+            // Restaurer les valeurs originales
+            Object.keys(originalValues).forEach(field => {
+                const cell = row.querySelector(`[data-field="${field}"]`);
+                if (cell) {
+                    cell.textContent = originalValues[field];
+                    cell.classList.remove('editing');
+                }
+            });
+            
+            exitEditMode(clientId);
+        }
+
+        function exitEditMode(clientId) {
+            const row = document.getElementById(`client-${clientId}`);
+            const editButton = row.querySelector('.btn-save, .btn-edit');
+            const cancelButton = row.querySelector('.btn-secondary');
+            
+            // Restaurer le bouton modifier
+            editButton.innerHTML = '<i class="bi bi-pencil"></i>';
+            editButton.className = 'btn btn-outline-warning btn-sm btn-edit';
+            editButton.style.cssText = 'outline: none !important; box-shadow: none !important;';
+            editButton.onfocus = function() { this.blur(); };
+            
+            // Supprimer le bouton annuler
+            if (cancelButton) {
+                cancelButton.remove();
+            }
+            
+            editingClient = null;
+            originalValues = {};
+        }
+
+        function updateDisplayValues(clientId, data) {
+            const row = document.getElementById(`client-${clientId}`);
+            
+            Object.keys(data).forEach(field => {
+                if (field !== 'id') {
+                    const cell = row.querySelector(`[data-field="${field}"]`);
+                    if (cell) {
+                        cell.textContent = data[field];
+                        cell.classList.remove('editing');
+                    }
+                }
+            });
+        }
+
+        function supprimerClient(clientId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce client ? Cette action supprimera aussi tous ses comptes et opérations. Cette action est irréversible.')) {
+                return;
+            }
+            
+            // VRAI APPEL AJAX VERS VOTRE BACKEND FLASK
+            fetch(`/clients/${clientId}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('Delete response status:', response.status);
+                
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        console.log('Delete response text:', text);
+                        throw new Error('Le serveur n\'a pas retourné du JSON valide pour la suppression');
+                    });
+                }
+                
+                return response.json();
+            })
+            .then(result => {
+                console.log('Delete result:', result);
+                if (result && result.success) {
+                    const row = document.getElementById(`client-${clientId}`);
+                    row.style.transition = 'all 0.5s ease';
+                    row.style.transform = 'translateX(-100%)';
+                    row.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        row.remove();
+                        showAlert('Client supprimé avec succès', 'success');
+                    }, 500);
+                } else {
+                    throw new Error(result ? result.message || 'Erreur lors de la suppression' : 'Réponse invalide du serveur');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur de suppression:', error);
+                showAlert('Erreur lors de la suppression: ' + error.message, 'danger');
+            });
+        }
+
+        // Fonctions utilitaires
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function showAlert(message, type) {
+            // Supprimer les alertes existantes
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            // Créer une nouvelle alerte Bootstrap
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                min-width: 300px;
+            `;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Suppression automatique après 5 secondes
+            setTimeout(() => {
+                if (alertDiv && alertDiv.parentNode) {
+                    const bsAlert = new bootstrap.Alert(alertDiv);
+                    bsAlert.close();
+                }
+            }, 5000);
+        }
+
+        // Gestion des touches
+        document.addEventListener('keydown', function(e) {
+            if (editingClient) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveClient(editingClient);
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelEdit(editingClient);
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -434,4 +434,3 @@ def supprimer_compte(numero):
 
 if __name__ == "__main__":
     app.run(debug=True)
-

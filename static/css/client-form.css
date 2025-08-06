@@ -370,3 +370,21 @@ select.form-input {
     margin-bottom: 30px;
     text-align: center;
 }
+.search-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 999;
+}
+
+.search-dropdown div {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.search-dropdown div:hover {
+    background: #f1f1f1;
+}

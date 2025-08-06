@@ -92,9 +92,6 @@
                         <i class="bi bi-wallet2"></i>
                         Comptes bancaires
                     </h3>
-                    <button class="btn btn-primary btn-sm" onclick="ajouterCompte()">
-                        <i class="bi bi-plus-circle"></i> Nouveau compte
-                    </button>
                 </div>
                 
                 <div class="accounts-grid">
@@ -103,7 +100,7 @@
                         <div class="account-header">
                             <div class="account-type">
                                 <i class="bi bi-credit-card"></i>
-                                {{ compte.type_compte }}
+                                {{ compte.type_carte }}
                             </div>
                             <div class="account-actions">
                                 <a href="{{ url_for('details_compte', numero=compte.numero) }}" class="btn-icon" title="Voir détails">
@@ -117,7 +114,7 @@
                             </div>
                         </div>
                         <div class="account-number">{{ compte.numero }}</div>
-                        <div class="account-balance">
+                                 <div class="account-balance">
                             <span class="balance-amount {{ 'positive' if compte.solde >= 0 else 'negative' }}">
                                 {{ compte.solde }}€
                             </span>

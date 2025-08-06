@@ -9,62 +9,29 @@ body {
     background-color: #f8fafc;
     display: flex;
     min-height: 100vh;
-}
-
-
-.widget-content-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: center;
-    text-align: right;
-}
-
-.widget-numbers {
-    line-height: 1.2;
-    display: block;
-    min-height: 2.5rem;
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin: 0;
-    color: white;
-    visibility: visible;
-    opacity: 1;
-}
-/* Empêche le scroll de la sidebar */
-.app-sidebar {
-    overflow: hidden !important;
-    height: 100vh !important;
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 240px; /* largeur fixe de ta sidebar */
-}
-
-/* S'assurer qu'aucun élément interne ne déborde */
-.app-sidebar * {
-    overflow: hidden !important;
-}
-body {
     overflow-y: auto;
 }
 
-
-/* MAIN CONTENT STYLES */
+/* CONTENU PRINCIPAL - Optimisé pour utiliser tout l'espace disponible */
 .main-content {
-    margin-left: 250px;
+    margin-left: 240px;            /* Espace pour la sidebar fixe */
+    width: calc(100vw - 240px);    /* Utilise toute la largeur de viewport moins la sidebar */
+    min-width: 0;                  /* Permet au contenu de se rétrécir si nécessaire */
+    padding: 0 15px;               /* Padding horizontal pour éviter que ça colle à gauche */
+    box-sizing: border-box;
     flex: 1;
-    padding: 20px;
-    width: calc(100% - 250px);
+    height: 100vh;                 /* Prend toute la hauteur de l'écran */
 }
 
+/* HEADER */
 .app-header {
     background: white;
-    padding: 15px 30px;
+    padding: 10px 15px;            /* Padding encore plus réduit */
     border-bottom: 1px solid #e5e7eb;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    border-radius: 12px;
+    margin: 0;                     /* Suppression de toute marge */
+    border-radius: 0;              /* Suppression des coins arrondis pour coller aux bords */
+    width: 100%;                   /* Prend toute la largeur disponible */
 }
 
 .app-header__content {
@@ -98,10 +65,11 @@ body {
 .page-title-wrapper {
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     color: white;
-    padding: 30px;
+    padding: 15px;                 /* Padding encore plus réduit */
     text-align: center;
-    margin-bottom: 30px;
-    border-radius: 12px;
+    margin: 0;                     /* Suppression de toute marge */
+    border-radius: 0;              /* Suppression des coins arrondis */
+    width: 100%;                   /* Prend toute la largeur */
 }
 
 .page-title-heading {
@@ -109,17 +77,38 @@ body {
     font-weight: 600;
 }
 
-/* WIDGET CARDS - CORRIGÉ POUR LA VISIBILITÉ */
+/* WIDGET CARDS */
+.widget-content-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    text-align: right;
+}
+
+.widget-numbers {
+    line-height: 1.2;
+    display: block;
+    min-height: 2.5rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+    visibility: visible;
+    opacity: 1;
+}
+
 .widget-card {
     background: white;
     border-radius: 12px;
-    padding: 25px;
+    padding: 15px;                 /* Padding réduit */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    margin-bottom: 20px;
-    height: 120px;
+    margin-bottom: 10px;           /* Marge réduite */
+    height: 100px;                 /* Hauteur réduite */
     display: flex;
     align-items: center;
+    width: 100%;                   /* Prend toute la largeur */
 }
 
 .widget-card:hover {
@@ -159,16 +148,31 @@ body {
     opacity: 0.7;
 }
 
-/* DASHBOARD CONTENT ET TABLE STYLES */
+/* DASHBOARD CONTENT - Optimisé pour prendre tout l'espace */
 .dashboard-content {
-    max-width: 100%;
-    margin: 0 auto;
+    width: 100%;                   /* Prend toute la largeur du conteneur parent */
+    max-width: none;               /* Supprime toute limite de largeur */
+    margin: 0;                     /* Supprime les marges auto */
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 0;              /* Suppression des coins arrondis pour coller aux bords */
+    box-shadow: none;              /* Suppression de l'ombre pour effet full-screen */
     overflow: hidden;
 }
 
+/* HEADER DU TABLEAU CLIENT */
+.clients-header {
+    background: linear-gradient(135deg, #fdf102 0%, #fd9401 100%);
+    color: rgb(17, 17, 17);
+    padding: 15px 20px;            /* Padding optimisé */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0;              /* Suppression des coins arrondis */
+    text-align: left;
+    flex-direction: row;
+    width: 100%;                   /* Prend toute la largeur */
+    margin: 0;                     /* Suppression de toute marge */
+}
 
 .clients-title {
     font-size: 28px;
@@ -198,19 +202,25 @@ body {
     color: white;
 }
 
+/* CONTENEUR DU TABLEAU - Optimisé */
 .table-container {
     padding: 0;
-    overflow-x: auto;
+    width: 100%;                   /* Prend toute la largeur */
+    max-width: none;               /* Supprime toute limite */
+    overflow-x: auto;              /* Scroll horizontal si nécessaire */
     display: block;
     visibility: visible;
 }
 
+/* TABLEAU CLIENT - Optimisé pour prendre tout l'espace */
 .clients-table {
-    width: 100%;
+    width: 100%;                   /* Prend toute la largeur du conteneur */
+    min-width: 100%;               /* Assure une largeur minimale */
     border-collapse: collapse;
     background: white;
-    font-size: 0.95rem;
+    font-size: 1rem;               /* Taille de police optimisée */
     display: table;
+    table-layout: auto;            /* Permet au tableau de s'adapter */
 }
 
 .clients-table thead {
@@ -218,7 +228,7 @@ body {
 }
 
 .clients-table th {
-    padding: 25px 30px;
+    padding: 20px 25px;            /* Padding optimisé */
     text-align: left;
     font-weight: 600;
     color: #374151;
@@ -226,6 +236,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 2px solid #e5e7eb;
+    white-space: nowrap;           /* Empêche le retour à la ligne dans les headers */
 }
 
 .client-row {
@@ -234,7 +245,7 @@ body {
 }
 
 .client-row td {
-    padding: 25px 30px;
+    padding: 20px 25px;            /* Padding optimisé */
     border-bottom: 1px solid #e5e7eb;
     color: #374151;
     font-size: 15px;
@@ -248,29 +259,32 @@ body {
 
 .actions-cell {
     position: relative;
-    width: 200px;
+    width: auto;                   /* Largeur automatique */
     text-align: center;
+    white-space: nowrap;           /* Empêche le retour à la ligne des boutons */
 }
 
 .btn-group {
     display: flex;
     gap: 8px;
     justify-content: center;
+    flex-wrap: nowrap;             /* Empêche le retour à la ligne des boutons */
 }
 
-/* BOUTONS */
+/* BOUTONS - Optimisés */
 .btn {
-    padding: 10px 20px;
+    padding: 8px 16px;             /* Padding optimisé */
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 600;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 0.9rem;
+    font-size: 0.85rem;            /* Taille réduite pour plus d'espace */
+    white-space: nowrap;           /* Empêche le retour à la ligne du texte */
 }
 
 .btn-primary {
@@ -301,11 +315,11 @@ body {
 
 .btn-outline-info {
     background: transparent;
-    border: 2px solid #36b9cc;
+    border: 1px solid #36b9cc;
     color: #36b9cc;
-    padding: 8px 12px;
+    padding: 6px 10px;             /* Padding réduit */
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -313,7 +327,7 @@ body {
     letter-spacing: 0.3px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 }
 
 .btn-outline-info:hover {
@@ -325,11 +339,11 @@ body {
 
 .btn-outline-warning {
     background: transparent;
-    border: 2px solid #f6c23e;
+    border: 1px solid #f6c23e;
     color: #f6c23e;
-    padding: 8px 12px;
+    padding: 6px 10px;             /* Padding réduit */
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -337,7 +351,7 @@ body {
     letter-spacing: 0.3px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 }
 
 .btn-outline-warning:hover {
@@ -349,11 +363,11 @@ body {
 
 .btn-outline-danger {
     background: transparent;
-    border: 2px solid #e74a3b;
+    border: 1px solid #e74a3b;
     color: #e74a3b;
-    padding: 8px 12px;
+    padding: 6px 10px;             /* Padding réduit */
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -361,7 +375,7 @@ body {
     letter-spacing: 0.3px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 }
 
 .btn-outline-danger:hover {
@@ -371,7 +385,7 @@ body {
     box-shadow: 0 4px 8px rgba(231, 74, 59, 0.3);
 }
 
-/* CHARTS - CORRIGÉ POUR LA VISIBILITÉ */
+/* CHARTS */
 .chart-container {
     background: white;
     border-radius: 12px;
@@ -380,6 +394,7 @@ body {
     margin-bottom: 20px;
     display: block;
     visibility: visible;
+    width: 100%;                   /* Prend toute la largeur */
 }
 
 .chart-header {
@@ -410,12 +425,13 @@ body {
     position: relative;
 }
 
-/* RECENT TRANSACTIONS TABLE - CORRIGÉ */
+/* RECENT TRANSACTIONS TABLE */
 .table-responsive {
     border-radius: 8px;
     overflow: hidden;
     display: block;
     visibility: visible;
+    width: 100%;                   /* Prend toute la largeur */
 }
 
 .table {
@@ -485,53 +501,7 @@ body {
     color: #1e40af;
 }
 
-    .main-content {
-        margin-left: 200px;
-        width: calc(100% - 200px);
-        padding: 15px;
-    }
-    
-    .clients-table th,
-    .clients-table td {
-        padding: 12px 16px;
-    }
-    
-    .clients-title {
-        font-size: 24px;
-    }
-   .clients-header {
-    background: linear-gradient(135deg, #fdf102 0%, #fd9401 100%);
-    color: rgb(17, 17, 17);
-    padding: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    text-align: left;
-    flex-direction: row; /* assure l’horizontalité */
-}
-
-
-/* ===== SECTION POUR SUPPRIMER LES SURLIGNEMENTS ===== */
-/* Styles pour agrandir le tableau et supprimer les surlignements */
-.table-container {
-    width: 100%;
-    max-width: none;
-}
-
-.clients-table {
-    width: 100%;
-    font-size: 1.1rem;
-}
-
-.clients-table th,
-.clients-table td {
-    padding: 15px 20px;
-    vertical-align: middle;
-}
-
-/* Supprimer TOUS les surlignements de lignes de tableau */
+/* SECTION POUR SUPPRIMER LES SURLIGNEMENTS */
 .clients-table tbody tr:hover {
     background-color: transparent !important;
     background: transparent !important;
@@ -671,15 +641,6 @@ body {
     box-shadow: none !important;
 }
 
-/* Agrandir l'espace du contenu principal */
-.main-content {
-    padding: 30px;
-}
-
-.dashboard-content {
-    max-width: none;
-}
-
 /* Supprimer les effets de focus sur les inputs */
 .form-control:focus {
     box-shadow: none !important;
@@ -702,7 +663,7 @@ body {
     border-radius: 0 !important;
 }
 
-/* Supprimer TOUS les surlignements au survol, même sur <tr>, <td> ou <button> */
+/* Supprimer TOUS les surlignements au survol */
 .clients-table tbody tr:hover,
 .clients-table tbody tr td:hover,
 .clients-table tbody tr td *,
@@ -719,59 +680,110 @@ body {
     transform: none !important;
 }
 
-/* Agrandir la section principale (en dehors de la sidebar) */
-.main-content {
-    width: 100%;
-    padding: 40px 60px;
-    margin-left: 240px; /* largeur de ta sidebar si fixe */
-    box-sizing: border-box;
-}
-
-/* Supprimer toute limite de largeur */
-.dashboard-content {
-    width: 100%;
-    max-width: 100%;
-}
-
-/* Le conteneur du tableau prend toute la place */
-.table-container {
-    width: 100%;
-    max-width: 100%;
-}
-
-/* Rendre le tableau full width */
-.clients-table {
-    width: 100%;
-    table-layout: auto;
-}
-/* Agrandir les boutons */
-.client-row .btn-group .btn {
-    padding: 6px 12px;
-    font-size: 1rem;
-    transition: transform 0.2s ease;
-}
-
-/* Optionnel : effet au survol */
-.client-row .btn-group .btn:hover {
-    transform: scale(1.1);
-}
+/* PAGINATION */
 .page-item.active .page-link {
-    background-color: #007bff; /* ou autre couleur */
+    background-color: #007bff;
     border-color: #007bff;
     color: white;
-    box-shadow: none; /* enlève l'effet de halo bleu */
+    box-shadow: none;
 }
 
 .page-link {
-    border-radius: 6px; /* coins arrondis */
-    margin: 0 4px; /* espace entre boutons */
+    border-radius: 6px;
+    margin: 0 4px;
 }
 
 .page-link:focus {
-    box-shadow: none; /* enlève le contour bleu au clic */
+    box-shadow: none;
 }
+
 .page-link:hover {
-    background-color: #007bff;  /* bleu au survol */
-    color: white;               /* texte blanc */
-    border-color: #007bff;      /* bordure bleue */
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* SEARCH - Optimisé */
+.search { 
+    display: flex;
+    gap: 20px;                     /* Gap réduit */
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0px 0px 20px 0px;
+    width: 100%;                   /* Prend toute la largeur */
+}
+
+.search input {
+    padding: 12px 20px;            /* Padding optimisé */
+    border: 1px solid #ccc;
+    border-radius: 25px;           /* Border radius optimisé */
+    width: 200px;                  /* Largeur optimisée */
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search input:focus {
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* RESPONSIVE - Pour les écrans plus petits */
+@media (max-width: 1200px) {
+    .main-content {
+        padding: 15px;             /* Padding réduit sur petits écrans */
+    }
+    
+    .clients-table th,
+    .clients-table td {
+        padding: 12px 15px;        /* Padding réduit */
+    }
+    
+    .btn {
+        padding: 6px 12px;         /* Boutons plus petits */
+        font-size: 0.8rem;
+    }
+    
+    .search {
+        gap: 15px;                 /* Gap réduit */
+    }
+    
+    .search input {
+        width: 150px;              /* Inputs plus petits */
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;            /* Supposant que la sidebar se cache sur mobile */
+        width: 100vw;
+        padding: 10px;
+    }
+    
+    .table-container {
+        overflow-x: scroll;        /* Scroll horizontal obligatoire sur mobile */
+    }
+    
+    .clients-table {
+        min-width: 800px;          /* Largeur minimale pour éviter l'écrasement */
+    }
+}
+.btn-search {
+    background: linear-gradient(135deg, #4981ea, #206aeb); /* dégradé */
+    color: white;                       /* texte blanc */
+    padding: 10px 20px;                  /* espace interne */
+    border: none;                        /* pas de bordure */
+    border-radius: 8px;                  /* coins arrondis */
+    font-weight: bold;                   /* texte en gras */
+    cursor: pointer;                     /* main au survol */
+    transition: all 0.3s ease;           /* animation fluide */
+}
+
+.btn-search:hover {
+    background: linear-gradient(135deg, #2a5298, #1e3c72); /* inverser dégradé */
+    transform: translateY(-2px);                           /* petit effet de relief */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);                /* ombre douce */
 }

@@ -294,7 +294,7 @@ body {
 .section-title {
   font-size: 1.2rem;
   font-weight: 600;
-  background: linear-gradient(180deg, #f5f90e, #fcad01);
+  background: linear-gradient(180deg, #76b0f2, #0e7cdc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

@@ -74,6 +74,25 @@ class Compte(db.Model):
     pin_code = db.Column(db.String(10))
     tentatives_pin = db.Column(db.Integer, default=0)
     bloque = db.Column(db.Boolean, default=False)
+@app.route('/search_client')
+def search_client():
+    q = request.args.get('q', '').strip()
+    if len(q) < 2:
+        return jsonify([])
+
+    results = Client.query.filter(
+        (Client.nom.ilike(f"%{q}%")) |
+        (Client.prenom.ilike(f"%{q}%")) |
+        (Client.id.ilike(f"%{q}%")) |
+        (Client.email.ilike(f"%{q}%"))
+    ).limit(20).all()
+
+    return jsonify([
+        {"id": c.id, "nom": c.nom, "prenom": c.prenom, "email": c.email}
+        for c in results
+    ])
+
+
 @app.context_processor
 def utility_processor():
     return dict(getattr=getattr)
@@ -135,16 +154,25 @@ def ajouter_compte():
     if request.method == "POST":
         client_id = request.form["client_id"]
         solde = float(request.form["solde"])
+        type_carte = request.form["type_carte"]  # ✅ récupère le type choisi
         numero = generate_account_number()
 
-        nouveau_compte = Compte(client_id=client_id, numero=numero, solde=solde)
+        nouveau_compte = Compte(
+            client_id=client_id,
+            numero=numero,
+            solde=solde,
+            type_carte=type_carte,   # ✅ on l’enregistre
+            date_expiration_carte=datetime.now().date(),
+            code_securite=str(random.randint(100, 999))
+        )
+
         db.session.add(nouveau_compte)
         db.session.commit()
 
-        # Affiche la modal de succès
         return render_template("ajouter_compte.html", clients=clients, show_modal=True)
 
     return render_template("ajouter_compte.html", clients=clients)
+
 @app.route("/supprimer-client", methods=["GET", "POST"])
 def supprimer_client():
     if request.method == "POST":
@@ -194,6 +222,10 @@ def ajouter_client():
         nom = request.form["nom"]
         prenom = request.form["prenom"]
         email = request.form["email"]
+        client_id = request.form.get("client_id")
+        if not client_id:
+            flash("Veuillez sélectionner un client dans la liste.")
+            return redirect(url_for("ajouter_compte"))
 
         if Client.query.filter_by(email=email).first():
             flash("❌ Email déjà utilisé.", "error")

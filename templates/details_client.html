@@ -76,45 +76,14 @@
                 <div class="client-info-section">
                     
                     <div class="client-details">
-                        <h1 class="client-name">{{ client.nom }} {{ client.prenom }}</h1>
-                        <p class="client-email"><i class="bi bi-envelope"></i> {{ client.email }}</p>
-                        <p class="client-id"><i class="bi bi-hash"></i> ID: {{ client.id }}</p>
-                        <p class="client-join-date"><i class="bi bi-calendar-plus"></i> Client depuis: {{ client.date_creation }}</p>
-                    </div>
-                </div>
-            </div>
+                        <div class="client-header d-flex align-items-center gap-4 mb-4">
 
-            <!-- Statistiques rapides -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon bg-primary">
-                        <i class="bi bi-wallet2"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number">{{ comptes|length }}</div>
-                        <div class="stat-label">Comptes</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon bg-info">
-                        <i class="bi bi-arrow-left-right"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number">{{ transactions|length }}</div>
-                        <div class="stat-label">Transactions</div>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon bg-warning">
-                        <i class="bi bi-clock-history"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number">{{ derniere_activite }}</div>
-                        <div class="stat-label">Dernière activité</div>
-                    </div>
-                </div>
-            </div>
+  <div>
+    <h2 class="client-name mb-1">{{ client.prenom }} {{ client.nom }} </h2>
+    <p class="text-muted mb-1"><i class="bi bi-envelope"></i> {{ client.email }}</p>
+    <span class="text-secondary small"><i class="bi bi-person-badge"></i> ID: {{ client.id }}</span>
+  </div>
+</div>
 
             <!-- Comptes bancaires -->
             <div class="section-card">
@@ -123,9 +92,6 @@
                         <i class="bi bi-wallet2"></i>
                         Comptes bancaires
                     </h3>
-                    <button class="btn btn-primary btn-sm" onclick="ajouterCompte()">
-                        <i class="bi bi-plus-circle"></i> Nouveau compte
-                    </button>
                 </div>
                 
                 <div class="accounts-grid">
@@ -134,7 +100,7 @@
                         <div class="account-header">
                             <div class="account-type">
                                 <i class="bi bi-credit-card"></i>
-                                {{ compte.type_compte }}
+                                {{ compte.type_carte }}
                             </div>
                             <div class="account-actions">
                                 <a href="{{ url_for('details_compte', numero=compte.numero) }}" class="btn-icon" title="Voir détails">
@@ -148,14 +114,14 @@
                             </div>
                         </div>
                         <div class="account-number">{{ compte.numero }}</div>
-                        <div class="account-balance">
+                                 <div class="account-balance">
                             <span class="balance-amount {{ 'positive' if compte.solde >= 0 else 'negative' }}">
                                 {{ compte.solde }}€
                             </span>
                         </div>
                         <div class="account-status">
-                            <span class="status-badge {{ 'active' if compte.etat_carte == 'actif' else 'inactive' }}">
-    {{ 'Actif' if compte.etat_carte == 'actif' else 'Inactif' }}
+                            <span class="status-badge {{ 'active' if compte.etat_carte | lower == 'actif' else 'inactive' }}">
+  {{ 'Actif' if compte.etat_carte | lower == 'actif' else 'Inactif' }}
 </span>
 
                         </div>
@@ -204,7 +170,7 @@
                                         {{ transaction.type }}
                                     </span>
                                 </td>
-                                <td class="account-info">{{ transaction.compte.numero_compte }}</td>
+                                <td class="account-info">{{ transaction.compte_obj.numero }}</td>
                                 <td class="transaction-description">{{ transaction.description or '-' }}</td>
                                 <td class="amount {{ 'positive' if transaction.montant > 0 else 'negative' }}">
                                     {{ '+' if transaction.montant > 0 else '' }}{{ transaction.montant }}€
@@ -235,7 +201,7 @@
 
         function ajouterCompte() {
             // Redirection vers la page d'ajout de compte
-            window.location.href = '/comptes/nouveau?client_id={{ client.id }}';
+            window.location.href = '/ajouter-compte?client_id={{ client.id }}';
         }
 
         function editAccount(compteId) {
@@ -252,7 +218,7 @@
 
         function nouvelleTransaction() {
             // Redirection vers la page de nouvelle transaction
-            window.location.href = '/transactions/nouvelle?client_id={{ client.id }}';
+             window.location.href = '/operations?client_id={{ client.id }}';
         }
 
         function voirTransaction(transactionId) {

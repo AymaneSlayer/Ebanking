@@ -14,6 +14,7 @@ body {
 
 /* SIDEBAR STYLES - IDENTIQUE AU STYLE EXISTANT */
 .app-container {
+    display: flex;
     width: 100%;
     min-height: 100vh;
 }
@@ -492,8 +493,8 @@ body {
         font-size: 15px;
     }
 }
+
 .main-content {
-    margin-left: 250px; /* exactement la largeur de la sidebar */
+    margin-left: 250px; /* même valeur que .app-sidebar width */
     width: calc(100% - 250px);
-    padding: 20px;
 }

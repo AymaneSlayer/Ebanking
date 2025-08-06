@@ -33,8 +33,21 @@
                 {% for compte in client.comptes %}
                     <div class="compte-box">
                         <p><strong>Numéro :</strong> {{ compte.numero }}</p>
-                        <p><strong>Solde :</strong> {{ compte.solde }} €</p>
+                        <p><strong>Intitulé :</strong> {{ compte.intitule or '—' }}</p>
+                        <p><strong>Solde :</strong> {{ compte.solde }} {{ compte.devise }}</p>
+                        <p><strong>Date création :</strong> {{ compte.date_creation }}</p>
+                        <p><strong>Dernière opération :</strong> {{ compte.derniere_operation or '—' }}</p>
+                        <p><strong>Plafond :</strong> {{ compte.plafond }}</p>
+                        <p><strong>Autorise découvert :</strong> {{ 'Oui' if compte.autorise_decouvert else 'Non' }}</p>
+                        <p><strong>Solde minimum :</strong> {{ compte.solde_minimum }}</p>
+                        <p><strong>Statut compte :</strong> {{ compte.statut }}</p>
+                        <p><strong>État carte :</strong> {{ compte.etat_carte }}</p>
+                        <p><strong>Banque :</strong> {{ compte.banque_nom }}</p>
+                        <p><strong>IBAN :</strong> {{ compte.iban or '—' }}</p>
+                        <p><strong>Compte bloqué :</strong> {{ 'Oui' if compte.bloque else 'Non' }}</p>
+                        <p><strong>Tentatives PIN :</strong> {{ compte.tentatives_pin }}</p>
                     </div>
+                    <hr>
                 {% endfor %}
             {% else %}
                 <div class="message-orange">⚠️ Ce client n'a pas encore de compte associé.</div>

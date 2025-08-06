@@ -2,6 +2,11 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
 from sqlalchemy import desc
+from sqlalchemy import Date
+from datetime import datetime
+from sqlalchemy import text
+from sqlalchemy import cast, String
+
 import random
 
 app = Flask(__name__)
@@ -46,11 +51,32 @@ class Operation(db.Model):
     date = db.Column(db.DateTime, nullable=False)
 
 class Compte(db.Model):
-    __tablename__ = 'Compte'   
+    __tablename__ = 'Compte'
     client_id = db.Column("ClientID", db.String, db.ForeignKey("Clients.ID"))
     numero = db.Column("Numero", db.String(20), primary_key=True)
     solde = db.Column("Solde", db.Float, nullable=False)
+    type_carte = db.Column("Type_Carte", db.String(20), nullable=False)
+    date_expiration_carte = db.Column("date_expiration_carte", db.Date, nullable=False)
     etat_carte = db.Column("etat_carte", db.String(20), nullable=False, default='actif')
+    code_securite = db.Column("code_securite", db.String(10), nullable=False)
+
+    # 🔴 NOUVEAUX CHAMPS 🔴
+    intitule = db.Column(db.String(100))
+    devise = db.Column(db.String(10), default='EUR')
+    date_creation = db.Column(db.Date, default=datetime.utcnow)
+    derniere_operation = db.Column(db.DateTime)
+    plafond = db.Column(db.Float, default=1000)
+    autorise_decouvert = db.Column(db.Boolean, default=False)
+    solde_minimum = db.Column(db.Float, default=0)
+    statut = db.Column(db.String(20), default='actif')
+    banque_nom = db.Column(db.String(100), default='Banque Adria')
+    iban = db.Column(db.String(34))
+    pin_code = db.Column(db.String(10))
+    tentatives_pin = db.Column(db.Integer, default=0)
+    bloque = db.Column(db.Boolean, default=False)
+@app.context_processor
+def utility_processor():
+    return dict(getattr=getattr)
 
 @app.route('/create-admin-table')
 def create_admin_table():
@@ -59,15 +85,28 @@ def create_admin_table():
         return "✅ Table Admins créée avec succès !"
     except Exception as e:
         return f"❌ Erreur : {e}"
-@app.route("/clients")
+@app.route('/clients')
 def liste_clients():
-    if 'utilisateur' not in session:
-        return redirect(url_for('login'))
+    nom = request.args.get('nom', '').strip()
+    prenom = request.args.get('prenom', '').strip()
+    email = request.args.get('email', '').strip()
+    client_id = request.args.get('id', '').strip()
+    
+    page = request.args.get('page', 1, type=int)
+    query = Client.query
 
-    clients = Client.query.all()
-    return render_template("Clients.html", clients=clients)
+    if nom:
+        query = query.filter(Client.nom.ilike(f"%{nom}%"))
+    if prenom:
+        query = query.filter(Client.prenom.ilike(f"%{prenom}%"))
+    if email:
+        query = query.filter(Client.email.ilike(f"%{email}%"))
+    if client_id:
+        query = query.filter(cast(Client.id, String).ilike(f"%{client_id}%"))
 
-# ✨ Page de connexion
+    clients = query.paginate(page=page, per_page=10)
+    return render_template('clients.html', clients=clients)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -168,12 +207,17 @@ def ajouter_client():
         return render_template("ajouter.html", show_modal=True)
 
     return render_template("ajouter.html")
-from datetime import datetime
-from sqlalchemy import text
 
 @app.route("/operations", methods=["GET", "POST"])
 def operations():
-    comptes = Compte.query.all()
+    client_id = request.args.get('client_id')
+    
+    # Si client_id est fourni, on filtre les comptes
+    if client_id:
+        comptes = Compte.query.filter_by(client_id=client_id).all()
+    else:
+        comptes = Compte.query.all()
+
     compte_selectionne = request.args.get('compte_selectionne', default=None)
 
     if request.method == "POST":
@@ -182,19 +226,19 @@ def operations():
             montant = float(request.form["montant"])
         except ValueError:
             flash("Montant invalide.", "error")
-            return redirect(url_for("operations", compte_selectionne=numero))
+            return redirect(url_for("operations", compte_selectionne=numero, client_id=client_id))
 
         type_op = request.form["type"]
         compte = Compte.query.filter_by(numero=numero).first()
 
         if not compte:
             flash("Compte introuvable.", "error")
-            return redirect(url_for("operations"))
+            return redirect(url_for("operations", client_id=client_id))
 
         if type_op == "Retrait":
             if compte.solde < montant:
                 flash("Solde insuffisant pour le retrait.", "error")
-                return redirect(url_for("operations", compte_selectionne=numero))
+                return redirect(url_for("operations", compte_selectionne=numero, client_id=client_id))
             compte.solde = round(compte.solde - montant, 2)
         elif type_op == "Dépôt":
             compte.solde = round(compte.solde + montant, 2)
@@ -210,36 +254,22 @@ def operations():
         db.session.add(compte)
         db.session.commit()
 
-        comptes = Compte.query.all()
-
         return render_template("depots.html", comptes=comptes, show_modal=True, compte_selectionne=numero)
 
     return render_template("depots.html", comptes=comptes, compte_selectionne=compte_selectionne)
 
-
-
 @app.route("/gerer-comptes", methods=["GET", "POST"])
-
 def gerer_comptes():
     client = None
+    was_posted = False
 
     if request.method == "POST":
+        was_posted = True
         client_id = request.form.get("client_id")
 
-        # Rechercher le client
         client = Client.query.filter_by(id=client_id).first()
 
-        if client and "update" in request.form:
-    # Mise à jour des données client uniquement
-            client.nom = request.form["nom"]
-            client.prenom = request.form["prenom"]
-            client.email = request.form["email"]
-
-
-        return render_template("gerer_comptes.html", client=client,was_posted=(request.method == "POST"))
-
-    # ✅ Ce return s’exécutera pour les requêtes GET
-    return render_template("gerer_comptes.html", client=None)
+    return render_template("gerer_comptes.html", client=client, was_posted=was_posted)
 
 
 @app.route("/init-db")
@@ -431,6 +461,67 @@ def supprimer_compte(numero):
     else:
         flash("Compte introuvable.", "error")
     return redirect(request.referrer or url_for('dashboard'))
+@app.route("/compte/<compte_id>/update", methods=["POST"])
+def update_compte(compte_id):
+    try:
+        data = request.get_json()
+        print("Serveur: données reçues:", data)
+
+        field = data.get("field")
+        value = data.get("value")
+
+        compte = Compte.query.filter_by(numero=compte_id).first()
+
+        if not compte:
+            return jsonify(success=False, message="Compte non trouvé")
+
+        # Conversion si nécessaire
+        if field == "solde":
+            try:
+                compte.solde = float(value)
+            except ValueError:
+                return jsonify(success=False, message="Solde invalide")
+        elif field == "code_securite":
+            compte.code_securite = value
+        elif field == "type_carte":
+            compte.type_carte = value
+        elif field == "date_expiration_carte":
+            compte.date_expiration_carte = datetime.strptime(value, "%Y-%m-%d").date()
+        elif field == "etat_carte":
+            compte.etat_carte = value
+        else:
+            return jsonify(success=False, message="Champ non reconnu")
+
+        db.session.commit()
+        print("Serveur: commit réussi")
+        return jsonify(success=True)
+
+    except Exception as e:
+        print("Serveur: erreur détectée >", str(e))
+        db.session.rollback()
+        return jsonify(success=False, message="Erreur serveur: " + str(e)), 500
+@app.route("/compte/<string:numero>/update_all", methods=["POST"])
+def update_all_fields(numero):
+    try:
+        data = request.get_json()
+        compte = Compte.query.filter_by(numero=numero).first()
+
+        if not compte:
+            return jsonify(success=False, message="Compte introuvable"), 404
+
+        compte.type_carte = data.get("type_carte", compte.type_carte)
+        compte.date_expiration_carte = datetime.strptime(data.get("date_expiration_carte"), "%Y-%m-%d") if data.get("date_expiration_carte") else compte.date_expiration_carte
+        compte.code_securite = data.get("code_securite", compte.code_securite)
+        compte.solde = float(data.get("solde", compte.solde))
+        compte.etat_carte = data.get("etat_carte", compte.etat_carte)
+
+        db.session.commit()
+        return jsonify(success=True, message="Mise à jour complète effectuée")
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(success=False, message=f"Erreur serveur : {str(e)}"), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)

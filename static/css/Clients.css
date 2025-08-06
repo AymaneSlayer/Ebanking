@@ -744,17 +744,6 @@ body {
     width: 100%;
     table-layout: auto;
 }
-/* Cacher les boutons par défaut */
-.client-row .btn-group {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-/* Montrer les boutons seulement au survol de la ligne */
-.client-row:hover .btn-group {
-    opacity: 1;
-}
-
 /* Agrandir les boutons */
 .client-row .btn-group .btn {
     padding: 6px 12px;
@@ -765,4 +754,24 @@ body {
 /* Optionnel : effet au survol */
 .client-row .btn-group .btn:hover {
     transform: scale(1.1);
+}
+.page-item.active .page-link {
+    background-color: #007bff; /* ou autre couleur */
+    border-color: #007bff;
+    color: white;
+    box-shadow: none; /* enlève l'effet de halo bleu */
+}
+
+.page-link {
+    border-radius: 6px; /* coins arrondis */
+    margin: 0 4px; /* espace entre boutons */
+}
+
+.page-link:focus {
+    box-shadow: none; /* enlève le contour bleu au clic */
+}
+.page-link:hover {
+    background-color: #007bff;  /* bleu au survol */
+    color: white;               /* texte blanc */
+    border-color: #007bff;      /* bordure bleue */
 }

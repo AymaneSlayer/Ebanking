@@ -525,4 +525,3 @@ def update_all_fields(numero):
 
 if __name__ == "__main__":
     app.run(debug=True)
-

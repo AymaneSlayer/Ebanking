@@ -6,7 +6,12 @@ from sqlalchemy import Date
 from datetime import datetime
 from sqlalchemy import text
 from sqlalchemy import cast, String
-
+from io import BytesIO
+from flask import send_file
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 import random
 
 app = Flask(__name__)
@@ -74,6 +79,120 @@ class Compte(db.Model):
     pin_code = db.Column(db.String(10))
     tentatives_pin = db.Column(db.Integer, default=0)
     bloque = db.Column(db.Boolean, default=False)
+@app.route('/export_clients_pdf')
+def export_clients_pdf():
+# Récupérer tous les clients (sans pagination)
+    clients = Client.query.all()
+
+    # Buffer mémoire pour le PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    doc.title = "Liste complète des clients"
+    doc.author = "E‑Banking Pro"
+    doc.subject = "Export complet des clients"
+    doc.creator = "E‑Banking Pro - Générateur PDF"
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Titre
+    elements.append(Paragraph("Liste complète des clients", styles['Title']))
+
+    # Préparer les données du tableau
+    data = [["ID", "Nom", "Prénom", "Email"]]
+    for client in clients:
+        data.append([client.id, client.nom, client.prenom, client.email])
+
+    # Créer le tableau
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#FFFFFF")),  # Jaune doré  # Fond bleu pour l'entête
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),                 # Texte blanc pour l'entête
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    elements.append(table)
+
+    # Générer le PDF
+    doc.build(elements)
+    buffer.seek(0)
+
+    # Envoyer le PDF au navigateur
+    return send_file(buffer, as_attachment=True,
+                     download_name="liste_clients.pdf",
+                     mimetype='application/pdf')
+@app.route("/clients/<client_id>/releve_pdf")
+def releve_client_pdf(client_id):
+    client = Client.query.get_or_404(client_id)
+    comptes = client.comptes
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # En-tête PDF
+    elements.append(Paragraph(f"Relevé client - {client.nom} {client.prenom}", styles['Title']))
+    elements.append(Paragraph(f"Client ID : {client.id}", styles['Normal']))
+    elements.append(Paragraph(f"Email : {client.email}", styles['Normal']))
+    elements.append(Paragraph(f"Nombre de comptes : {len(comptes)}", styles['Normal']))
+    elements.append(Paragraph("<br/>", styles['Normal']))
+
+    # Boucle sur chaque compte
+    for compte in comptes:
+        data = [
+            ["Numéro de compte", compte.numero],
+            ["Type carte", compte.type_carte],
+            ["Date expiration", str(compte.date_expiration_carte)],
+            ["État carte", compte.etat_carte],
+            ["Code sécurité", compte.code_securite],
+            ["Solde", f"{compte.solde} {compte.devise}"],
+            ["Date création", str(compte.date_creation)],
+            ["Plafond", compte.plafond],
+            ["Découvert autorisé", compte.autorise_decouvert],
+            ["Solde minimum", compte.solde_minimum],
+            ["Statut", compte.statut],
+            ["Banque", compte.banque_nom],
+            ["IBAN", compte.iban],
+            ["Tentatives PIN", compte.tentatives_pin],
+            ["Bloqué", compte.bloque]
+        ]
+
+        table = Table(data, colWidths=[150, 300])
+        table.setStyle(TableStyle([
+            ('GRID', (0,0), (-1,-1), 0.5, colors.black),
+            ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#f5f5f5")),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ]))
+
+        elements.append(Paragraph(f"<b>Compte n° {compte.numero}</b>", styles['Heading2']))
+        elements.append(table)
+        elements.append(Paragraph("<br/><br/>", styles['Normal']))
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    return send_file(buffer, as_attachment=True,
+                     download_name=f"releve_client_{client.id}.pdf",
+                     mimetype='application/pdf')
+@app.route("/modifier-client/<string:client_id>", methods=["GET", "POST"])
+def modifier_client_page(client_id):
+    client = Client.query.get_or_404(client_id)
+
+    if request.method == "POST":
+        client.nom = request.form["nom"]
+        client.prenom = request.form["prenom"]
+        client.email = request.form["email"]
+
+        db.session.commit()
+        flash("✅ Informations du client mises à jour", "success")
+        return redirect(url_for("liste_clients"))
+
+    return render_template("modifier_client.html", client=client)
+
 @app.route('/search_client')
 def search_client():
     q = request.args.get('q', '').strip()
@@ -215,18 +334,14 @@ def home():
     return redirect(url_for("login"))
 
 
-# Route Ajout
 @app.route("/ajouter", methods=["GET", "POST"])
 def ajouter_client():
     if request.method == "POST":
         nom = request.form["nom"]
         prenom = request.form["prenom"]
         email = request.form["email"]
-        client_id = request.form.get("client_id")
-        if not client_id:
-            flash("Veuillez sélectionner un client dans la liste.")
-            return redirect(url_for("ajouter_compte"))
 
+        # Vérifier si l'email existe déjà
         if Client.query.filter_by(email=email).first():
             flash("❌ Email déjà utilisé.", "error")
             return redirect(url_for("ajouter_client"))
@@ -235,10 +350,11 @@ def ajouter_client():
         db.session.add(nouveau)
         db.session.commit()
 
-        # Affiche la popup
-        return render_template("ajouter.html", show_modal=True)
+        flash("✅ Client créé avec succès.", "success")
+        return redirect(url_for("liste_clients"))
 
     return render_template("ajouter.html")
+
 
 @app.route("/operations", methods=["GET", "POST"])
 def operations():

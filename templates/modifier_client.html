@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier Client</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Styles pour gérer la sidebar fixe */
+        .main-content {
+            margin-left: 250px; /* Ajustez selon la largeur de votre sidebar */
+            padding: 20px;
+        }
+        
+        /* Pour les écrans plus petits */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 10px;
+            }
+        }
+        
+        /* Si votre sidebar a une classe spécifique, vous pouvez l'ajuster */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px; /* Largeur de votre sidebar */
+            height: 100vh;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    {% include 'sidebar.html' %}
+    
+    <!-- Contenu principal avec marge pour éviter le chevauchement -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2>Modifier Client</h2>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Nom</label>
+                    <input type="text" name="nom" class="form-control" value="{{ client.nom }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Prénom</label>
+                    <input type="text" name="prenom" class="form-control" value="{{ client.prenom }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ client.email }}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a href="{{ url_for('liste_clients') }}" class="btn btn-secondary ms-2">Annuler</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

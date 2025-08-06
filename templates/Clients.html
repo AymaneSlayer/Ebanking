@@ -34,6 +34,9 @@
                             <input type="text" name="id" placeholder="ID" value="{{ request.args.get('id', '') }}">
                             <button type="submit" class="btn-search">Rechercher</button>
                         </form>
+                        <a href="{{ url_for('export_clients_pdf') }}" class="btn btn-danger">
+    <i class="bi bi-file-earmark-pdf"></i> Exporter en PDF
+</a>
 
                         <table class="table clients-table">
                             <thead class="table-primary">
@@ -60,7 +63,7 @@
                                                     onfocus="this.blur()">
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                            <a href="#" class="btn btn-outline-secondary btn-sm"
+                                            <a href="{{ url_for('modifier_client_page', client_id=client.id) }}" class="btn btn-outline-secondary btn-sm"
    style="outline: none !important; box-shadow: none !important;"
    onfocus="this.blur()">
    <i class="bi bi-pencil"></i>

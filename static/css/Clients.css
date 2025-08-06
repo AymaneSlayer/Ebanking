@@ -162,7 +162,7 @@ body {
 /* HEADER DU TABLEAU CLIENT */
 .clients-header {
     background: linear-gradient(135deg, #fdf102 0%, #fd9401 100%);
-    color: rgb(17, 17, 17);
+    color: rgb(113, 104, 104);
     padding: 15px 20px;            /* Padding optimisé */
     display: flex;
     justify-content: space-between;
@@ -785,5 +785,17 @@ body {
 .btn-search:hover {
     background: linear-gradient(135deg, #2a5298, #1e3c72); /* inverser dégradé */
     transform: translateY(-2px);                           /* petit effet de relief */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);                /* ombre douce */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.985);                /* ombre douce */
 }
+/* Agrandir tous les boutons dans la colonne Actions */
+.btn-group .btn {
+    width: 45px;
+    height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem; /* icône plus grosse */
+    padding: 0;
+    border-radius: 8px; /* coins arrondis */
+}
+

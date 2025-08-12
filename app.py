@@ -27,7 +27,7 @@ class Admin(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)  # non hashé si tu veux le laisser simple
+    password = db.Column(db.String(255), nullable=False)  
 
 # Modèle Client
 class Client(db.Model):
@@ -39,12 +39,6 @@ class Client(db.Model):
     email = db.Column("Email", db.String(100), unique=True, nullable=False)
 
     comptes = db.relationship("Compte", backref="client", lazy=True)
-    
-
-    # ⚠️ Vérifie qu'il n'y a PAS de ligne comme :
-    # etat_carte = db.Column(...) ❌
-
-
 # Modèle Compte
 class Operation(db.Model):
     __tablename__ = 'Operations'   
@@ -64,8 +58,6 @@ class Compte(db.Model):
     date_expiration_carte = db.Column("date_expiration_carte", db.Date, nullable=False)
     etat_carte = db.Column("etat_carte", db.String(20), nullable=False, default='actif')
     code_securite = db.Column("code_securite", db.String(10), nullable=False)
-
-    # 🔴 NOUVEAUX CHAMPS 🔴
     intitule = db.Column(db.String(100))
     devise = db.Column(db.String(10), default='EUR')
     date_creation = db.Column(db.Date, default=datetime.utcnow)
@@ -81,10 +73,7 @@ class Compte(db.Model):
     bloque = db.Column(db.Boolean, default=False)
 @app.route('/export_clients_pdf')
 def export_clients_pdf():
-# Récupérer tous les clients (sans pagination)
     clients = Client.query.all()
-
-    # Buffer mémoire pour le PDF
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     doc.title = "Liste complète des clients"
@@ -93,16 +82,10 @@ def export_clients_pdf():
     doc.creator = "E‑Banking Pro - Générateur PDF"
     elements = []
     styles = getSampleStyleSheet()
-
-    # Titre
     elements.append(Paragraph("Liste complète des clients", styles['Title']))
-
-    # Préparer les données du tableau
     data = [["ID", "Nom", "Prénom", "Email"]]
     for client in clients:
         data.append([client.id, client.nom, client.prenom, client.email])
-
-    # Créer le tableau
     table = Table(data)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#FFFFFF")),  # Jaune doré  # Fond bleu pour l'entête
@@ -115,12 +98,8 @@ def export_clients_pdf():
     ]))
 
     elements.append(table)
-
-    # Générer le PDF
     doc.build(elements)
     buffer.seek(0)
-
-    # Envoyer le PDF au navigateur
     return send_file(buffer, as_attachment=True,
                      download_name="liste_clients.pdf",
                      mimetype='application/pdf')
@@ -133,15 +112,11 @@ def releve_client_pdf(client_id):
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     elements = []
     styles = getSampleStyleSheet()
-
-    # En-tête PDF
     elements.append(Paragraph(f"Relevé client - {client.nom} {client.prenom}", styles['Title']))
     elements.append(Paragraph(f"Client ID : {client.id}", styles['Normal']))
     elements.append(Paragraph(f"Email : {client.email}", styles['Normal']))
     elements.append(Paragraph(f"Nombre de comptes : {len(comptes)}", styles['Normal']))
     elements.append(Paragraph("<br/>", styles['Normal']))
-
-    # Boucle sur chaque compte
     for compte in comptes:
         data = [
             ["Numéro de compte", compte.numero],
@@ -261,7 +236,7 @@ def login():
 
     return render_template('login.html')
 
-# ✨ Page de déconnexion
+#  Page de déconnexion
 @app.route('/logout')
 def logout():
     session.pop('utilisateur', None)
@@ -273,14 +248,14 @@ def ajouter_compte():
     if request.method == "POST":
         client_id = request.form["client_id"]
         solde = float(request.form["solde"])
-        type_carte = request.form["type_carte"]  # ✅ récupère le type choisi
+        type_carte = request.form["type_carte"]  
         numero = generate_account_number()
 
         nouveau_compte = Compte(
             client_id=client_id,
             numero=numero,
             solde=solde,
-            type_carte=type_carte,   # ✅ on l’enregistre
+            type_carte=type_carte,   
             date_expiration_carte=datetime.now().date(),
             code_securite=str(random.randint(100, 999))
         )
@@ -302,13 +277,9 @@ def supprimer_client():
         if not client:
             flash("❌ Client introuvable.", "error")
             return redirect(url_for("supprimer_client"))
-
-        # Supprimer tous les comptes liés
         if client.comptes:
             for compte in client.comptes:
                 db.session.delete(compte)
-
-        # Supprimer le client
         db.session.delete(client)
         db.session.commit()
 
@@ -340,8 +311,6 @@ def ajouter_client():
         nom = request.form["nom"]
         prenom = request.form["prenom"]
         email = request.form["email"]
-
-        # Vérifier si l'email existe déjà
         if Client.query.filter_by(email=email).first():
             flash("❌ Email déjà utilisé.", "error")
             return redirect(url_for("ajouter_client"))
@@ -359,8 +328,7 @@ def ajouter_client():
 @app.route("/operations", methods=["GET", "POST"])
 def operations():
     client_id = request.args.get('client_id')
-    
-    # Si client_id est fourni, on filtre les comptes
+
     if client_id:
         comptes = Compte.query.filter_by(client_id=client_id).all()
     else:
@@ -429,27 +397,17 @@ def init_db():
         return "✅ Base de données initialisée avec succès !"
     except Exception as e:
         return f"❌ Erreur lors de l'initialisation : {str(e)}"
-
-
-
-# 🔧 AJOUTEZ CES ROUTES À VOTRE app.py
-
 @app.route('/clients/<client_id>/update', methods=['PUT'])
 def update_client(client_id):
     try:
         data = request.get_json()
-        print(f"Données reçues pour mise à jour: {data}")  # Debug
-        
-        # Chercher le client par ID
+        print(f"Données reçues pour mise à jour: {data}")  
         client = Client.query.filter_by(id=client_id).first()
         if not client:
             return jsonify({'success': False, 'message': 'Client non trouvé'}), 404
         
-        # Validation des données
         if not data.get('nom') or not data.get('prenom') or not data.get('email'):
             return jsonify({'success': False, 'message': 'Tous les champs sont requis'}), 400
-        
-        # Vérifier si l'email n'est pas déjà utilisé par un autre client
         email_existe = Client.query.filter(
             Client.email == data['email'],
             Client.id != client_id
@@ -484,29 +442,26 @@ def update_client(client_id):
 @app.route('/clients/<client_id>/delete', methods=['DELETE'])
 def delete_client(client_id):
     try:
-        print(f"Tentative de suppression du client: {client_id}")  # Debug
-        
-        # Chercher le client par ID
+        print(f"Tentative de suppression du client: {client_id}")  
         client = Client.query.filter_by(id=client_id).first()
         if not client:
             return jsonify({'success': False, 'message': 'Client non trouvé'}), 404
         
-        # Supprimer d'abord tous les comptes liés (pour éviter les erreurs de contrainte)
         comptes_lies = Compte.query.filter_by(client_id=client_id).all()
         for compte in comptes_lies:
-            # Supprimer les opérations liées au compte
+       
             operations_liees = Operation.query.filter_by(compte=compte.numero).all()
             for operation in operations_liees:
                 db.session.delete(operation)
             
-            # Supprimer le compte
+       
             db.session.delete(compte)
         
-        # Supprimer le client
+    
         db.session.delete(client)
         db.session.commit()
         
-        print(f"Client {client_id} supprimé avec succès")  # Debug
+        print(f"Client {client_id} supprimé avec succès")  
         
         return jsonify({
             'success': True, 
@@ -517,7 +472,6 @@ def delete_client(client_id):
         print(f"Erreur lors de la suppression: {e}")  # Debug
         db.session.rollback()
         return jsonify({'success': False, 'message': f'Erreur serveur: {str(e)}'}), 500
-# ➕ Nouvelle route : Dashboard
 @app.route("/dashboard")
 def dashboard():
     if 'utilisateur' not in session:
